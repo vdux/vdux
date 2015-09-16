@@ -9,6 +9,10 @@ Stateless virtual dom &lt;-&gt; Redux
 
     $ npm install vdux
 
+### Running the examples
+
+    $ cd examples/basic && budo --live -t babelify index.js
+
 ## Setup
 
 vdux takes a stateless [virtual-dom](https://github.com/Matt-Esch/virtual-dom), and wires it to a [redux](https://github.com/rackt/redux) store.  You call it like this:
@@ -21,7 +25,19 @@ From then on, when your store emits a state update, your new state atom will be 
 
 ## DOM Events
 
-Your DOM event handlers get setup in the standard way that [virtual-dom](https://github.com/Matt-Esch/virtual-dom) does it via delegation.  That is, you set `ev-&lt;eventName&gt;` as an attribute on your element (e.g. `ev-click`).  The way your event handlers trigger actions however is by returning a value.  The return value of your DOM event handlers will be dispatched into your redux store.  This forms a [cycle](https://github.com/cyclejs/cycle-core) that will define your entire application in a side-effect free way.
+Your DOM event handlers get setup in the standard way that [virtual-dom](https://github.com/Matt-Esch/virtual-dom) does it via delegation.  That is, you set `ev-*eventName*` as an attribute on your element (e.g. `ev-click`).  Your event handlers are pure functions that return a value.  That value is then dispatched into redux.  This forms a [cycle](https://github.com/cyclejs/cycle-core) that will define your entire application in a side-effect free way.
+
+```javascript
+function counter (props) {
+  return h('div', {'ev-click': increment}, ['Value: ' + props.counter])
+}
+
+function increment () {
+  return {
+    type: 'INCREMENT'
+  }
+}
+```
 
 ## Side-effects
 
