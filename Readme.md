@@ -23,7 +23,13 @@ vdux(store, app, rootNode)
 
 From then on, when your `store` emits a state update, your new state atom will be passed to `app`, which will render into `rootNode`.
 
-## DOM Events
+### Params
+
+  * `store` - A redux store, or something that exports a similar interface (`subscribe`/`dispatch` functions).
+  * `app` - A pure function that takes a single argument, state, and returns a virtual-dom tree.
+  * `rootNode` - The DOM node in which to render `app`.
+
+## DOM Events / Actions
 
 Your DOM event handlers get setup in the standard way that [virtual-dom](https://github.com/Matt-Esch/virtual-dom) does it via delegation.  That is, you set `ev-*eventName*` as an attribute on your element (e.g. `ev-click`).  Your event handlers are pure functions that return a value.  That value is then dispatched into redux.  This forms a [cycle](https://github.com/cyclejs/cycle-core) that will define your entire application in a side-effect free way.
 
