@@ -31,7 +31,7 @@ From then on, when your `store` emits a state update, your new state atom will b
 
 ## DOM Events / Actions
 
-Your DOM event handlers get setup in the standard way that [virtual-dom](https://github.com/Matt-Esch/virtual-dom) does it via delegation.  That is, you set `ev-*eventName*` as an attribute on your element (e.g. `ev-click`).  Your event handlers are pure functions that return a value.  That value is then dispatched into redux.  This forms a [cycle](https://github.com/cyclejs/cycle-core) that will define your entire application in a side-effect free way.
+Your DOM event handlers get setup in the standard way that [virtual-dom](https://github.com/Matt-Esch/virtual-dom) does it via delegation.  That is, you set an attribute on your element prefixed by `ev-` (e.g. `ev-click`).  Your event handlers are pure functions that return a value.  That value is then dispatched into redux.  This forms a [cycle](https://github.com/cyclejs/cycle-core) that will define your entire application in a side-effect free way.
 
 ```javascript
 function counter (props) {
@@ -52,7 +52,6 @@ Almost side-effect free, anyway.  You still need to do things like issue request
   * [redux-effects](https://github.com/redux-effects/redux-effects)
   * [redux-thunk](https://github.com/gaearon/redux-thunk)
   * [redux-promise](https://github.com/acdlite/redux-promise)
-
 
 ## License
 
