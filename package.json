@@ -1,5 +1,5 @@
 {
-  "name": "@ashaffer/vdux",
+  "name": "vdux",
   "description": "Stateless virtual dom &lt;-&gt; Redux",
   "repository": "git://github.com/ashaffer/vdux.git",
   "version": "0.1.0",
@@ -10,12 +10,15 @@
     "postpublish": "rm -rf lib"
   },
   "dependencies": {
+    "babelify": "^6.3.0",
     "ev-store": "^7.0.0",
     "virtual-dom": "^2.1.1"
   },
   "devDependencies": {
     "babel": "^5.8.21",
     "babel-tape-runner": "^1.2.0",
+    "budo": "^4.2.1",
+    "redux": "^3.0.0",
     "standard": "^5.1.0",
     "tape": "^4.2.0"
   },

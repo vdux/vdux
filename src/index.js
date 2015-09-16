@@ -3,7 +3,7 @@
  */
 
 import delegator from './delegator'
-import {diff, patch, createElement} from 'virtual-dom'
+import {diff, patch, create} from 'virtual-dom'
 
 /**
  * vdux
@@ -13,13 +13,13 @@ function vdux (store, app, node) {
   store.subscribe(update)
 
   let tree = render()
-  let rootNode = createElement(tree)
+  let rootNode = create(tree)
 
   node.appendChild(rootNode)
 
   // Set delegator on the node *above* our actual node
   // so that it doesn't change
-  delegator(dispatch, node)
+  delegator(store.dispatch, node)
 
   function update () {
     const newTree = render()

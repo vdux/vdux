@@ -7,7 +7,7 @@ Stateless virtual dom &lt;-&gt; Redux
 
 ## Installation
 
-    $ npm install @ashaffer/vdux
+    $ npm install vdux
 
 ## Setup
 

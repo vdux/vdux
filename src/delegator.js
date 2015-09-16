@@ -23,23 +23,25 @@ const events = [
 function delegator (dispatch, rootNode) {
   events.forEach(bind)
 
-  function bind (event) {
-    rootNode.addEventListener(event, e => listener(name, e), true)
+  function bind (name) {
+    rootNode.addEventListener(name, e => listener(name, e), true)
   }
 
   function listener(name, e) {
-    const handler = EvStore(e.)
-    bubble(e)
+    bubble(name, e.target, e)
   }
 
   function bubble (name, target, e) {
-    const handler = EvStore(target)[type]
+    const es = EvStore(target)
+    const handler = es[name]
 
     if (handler) {
       dispatch(handler(e))
     }
 
-    target.parentNode && bubble(name, target.parentNode, e)
+    if (target.parentNode && target.parentNode !== rootNode) {
+      bubble(name, target.parentNode, e)
+    }
   }
 }
 
