@@ -10,7 +10,7 @@
     "postpublish": "rm -rf lib"
   },
   "dependencies": {
-    "dom-delegator": "^13.1.0",
+    "ev-store": "^7.0.0",
     "virtual-dom": "^2.1.1"
   },
   "devDependencies": {
