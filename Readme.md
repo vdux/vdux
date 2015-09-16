@@ -21,7 +21,7 @@ vdux takes a stateless [virtual-dom](https://github.com/Matt-Esch/virtual-dom), 
 vdux(store, app, rootNode)
 ```
 
-From then on, when your store emits a state update, your new state atom will be passed to `app`, which will render into rootNode.
+From then on, when your store emits a state update, your new state atom will be passed to `app`, which will render into `rootNode`.
 
 ## DOM Events
 
