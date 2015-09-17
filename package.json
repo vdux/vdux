@@ -10,6 +10,7 @@
     "postpublish": "rm -rf lib"
   },
   "dependencies": {
+    "compose-function": "^2.0.0",
     "delegant": "^0.1.0",
     "ev-store": "^7.0.0",
     "virtual-dom": "^2.1.1"
