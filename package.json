@@ -19,8 +19,13 @@
     "babel": "^5.8.21",
     "babel-tape-runner": "^1.2.0",
     "babelify": "^6.3.0",
+    "bind-effect": "^0.1.0",
     "budo": "^4.2.1",
+    "declarative-fetch": "^0.1.13",
     "redux": "^3.0.0",
+    "redux-effects": "^0.2.0",
+    "redux-effects-fetch": "^0.1.11",
+    "redux-multi": "^0.1.8",
     "standard": "^5.1.0",
     "tape": "^4.2.0"
   },
