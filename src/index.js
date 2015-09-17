@@ -2,7 +2,7 @@
  * Imports
  */
 
-import delegator from './delegator'
+import delegate from 'delegant'
 import {diff, patch, create} from 'virtual-dom'
 
 /**
@@ -19,7 +19,7 @@ function vdux (store, app, node) {
 
   // Set delegator on the node *above* our actual node
   // so that it doesn't change
-  delegator(store.dispatch, node)
+  delegate(node, store.dispatch)
 
   function update () {
     const newTree = render()
