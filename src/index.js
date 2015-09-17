@@ -3,6 +3,7 @@
  */
 
 import delegate from 'delegant'
+import compose from 'compose-function'
 import {diff, patch, create} from 'virtual-dom'
 
 /**
@@ -23,8 +24,10 @@ function vdux (store, app, node) {
    * Create the Virtual DOM <-> Redux cycle
    */
 
-  delegate(node, store.dispatch)
-  store.subscribe(update)
+  return compose(
+    delegate(node, store.dispatch),
+    store.subscribe(update)
+  )
 
   /**
    * Render a new virtual dom
