@@ -3,7 +3,6 @@
  */
 
 import element from 'vdom-element'
-import {requestPosts} from '../actions'
 
 /**
  * Render
