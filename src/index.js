@@ -25,7 +25,7 @@ function vdux (store, app, node) {
    */
 
   return compose(
-    delegate(node, store.dispatch),
+    delegate(node, action => action && store.dispatch(action)),
     store.subscribe(update)
   )
 
