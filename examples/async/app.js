@@ -2,53 +2,61 @@
  * Imports
  */
 
-import h from 'virtual-dom/h'
+import element from 'vdom-element'
 import {requestPosts, selectReddit} from './actions'
 import Posts from './components/posts'
 import Picker from './components/picker'
 
 /**
- * App
+ * beforeMount
  */
 
-function App (props) {
-  const {reddit, posts, loading, lastUpdated} = props
-
-  return h('div', null, [
-    Picker({value: reddit, onChange: selectReddit, options: ['reactjs', 'frontend']}),
-    h('p', null, [
-      LastUpdated({time: lastUpdated}),
-      loading
-        ? null
-        : RefreshButton({onClick: e => requestPosts(reddit)})
-    ]),
-    loading && posts.length === 0
-      ? h('h2', null, ['Loading...'])
-      : null,
-    !loading && posts.length === 0
-      ? h('h2', null, ['Empty.'])
-      : null,
-    posts.length > 0
-      ? h('div', {style: {opacity: loading ? 0.5 : 1}}, [Posts(posts)])
-      : null
-  ])
+function beforeMount (props) {
+  return requestPosts(props.reddit)
 }
 
 /**
- * Components
+ * beforeUpdate
  */
 
-function LastUpdated ({time}) {
-  const str = new Date(time).toLocaleTimeString()
-  return h('span', null, [`Last updated at ${str}. `])
+function beforeUpdate (prevProps, nextProps) {
+  if (prevProps.reddit !== nextProps.reddit) {
+    return requestPosts(nextProps.reddit)
+  }
 }
 
-function RefreshButton ({onClick}) {
-  return h('a', {href: '#', 'ev-click': onClick}, ['Refresh'])
+/**
+ * Render
+ */
+
+function render (props) {
+  const {reddit, posts, loading, lastUpdated} = props
+  const lastUpdatedStr = new Date(lastUpdated).toLocaleTimeString()
+
+  return (
+    <div>
+      <Picker value={reddit} onChange={selectReddit} options={['reactjs', 'frontend']} />
+      <p>
+        <span>
+          {`Last updated at ${lastUpdatedStr}`}.{' '}
+        </span>
+        <a href='#' ev-click={() => requestPosts(reddit)}>
+          Refresh
+        </a>
+      </p>
+      {loading && <h2>Loading...</h2>}
+      {!loading && posts.length === 0 && <h2>Empty.</h2>}
+      <Posts reddit={reddit} posts={posts} />
+    </div>
+  )
 }
 
 /**
  * Exports
  */
 
-export default App
+export default {
+  beforeMount,
+  beforeUpdate,
+  render
+}

@@ -24,7 +24,8 @@ function reducer (state, action) {
       return {
         ...state,
         loading: false,
-        posts: action.posts
+        posts: action.posts,
+        lastUpdated: action.dispatchedAt
       }
   }
 

@@ -2,25 +2,29 @@
  * Imports
  */
 
-import h from 'virtual-dom/h'
+import element from 'vdom-element'
 
 /**
- * Picker
+ * Render
  */
 
-function Picker (props) {
+function render (props) {
   const {value, onChange, options} = props
 
-  return h('span', null, [
-    h('h1', null, [value]),
-    h('select', {'ev-change': e => onChange(e.target.value)},
-      options
-        .map(opt => h('option', {value: opt, key: opt}, [opt])))
-  ])
+  return (
+    <span>
+      <h1>{value}</h1>
+      <select ev-change={e => onChange(e.target.value)}>
+        {options.map(opt => <option value={opt} key={opt}>{opt}</option>)}
+      </select>
+    </span>
+  )
 }
 
 /**
  * Exports
  */
 
-export default Picker
+export default {
+  render
+}

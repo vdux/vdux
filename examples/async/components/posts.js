@@ -2,20 +2,23 @@
  * Imports
  */
 
-import h from 'virtual-dom/h'
+import element from 'vdom-element'
+import {requestPosts} from '../actions'
 
 /**
- * Posts
+ * Render
  */
 
-function Posts (posts) {
-  return h('div', null, [
-    posts.map(post => h('li', null, [post.title]))
-  ])
+function render ({posts = []}) {
+  return (
+    <div>
+      {posts.map(post => <li>{post.title}</li>)}
+    </div>
+  )
 }
 
 /**
  * Exports
  */
 
-export default Posts
+export default render
