@@ -5,6 +5,18 @@
 import element from 'vdom-element'
 import {addTodo, removeTodo, markTodoImportant} from './actions'
 import localize from 'vdux-local'
+import Todo from './components/todo'
+
+/**
+ * initialState
+ */
+
+function initialState () {
+  return {
+    todos: [],
+    text: ''
+  }
+}
 
 /**
  * handleKeyup
@@ -23,14 +35,17 @@ function handleKeyup (setState, e) {
  */
 
 function render (props, setState) {
-  const {app = {}, todos} = props
+  const {app = {}, todos, key} = props
+  const todoKey = idx => key + '.todos.' + idx
 
   return (
     <div>
       <input type='text' ev-keyup={e => handleKeyup(setState, e)} value={app.text} />
       <ul>
         {
-          todos.map(todo => <li>{todo.text}</li>)
+          todos.map((todo, i) =>
+            <Todo key={todoKey(i)} text={todo.text} {...app.todos[i]} />
+          )
         }
       </ul>
     </div>
@@ -42,5 +57,6 @@ function render (props, setState) {
  */
 
 export default localize({
+  initialState,
   render
 })
