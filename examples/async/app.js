@@ -46,7 +46,7 @@ function render (props) {
       </p>
       {loading && <h2>Loading...</h2>}
       {!loading && posts.length === 0 && <h2>Empty.</h2>}
-      <Posts posts={posts} />
+      {!loading && posts.length > 0 && <Posts posts={posts} />}
     </div>
   )
 }

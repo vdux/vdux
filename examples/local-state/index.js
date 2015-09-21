@@ -24,5 +24,5 @@ const store = createStore({
 
 store.dispatch(handleOnce('domready', () => {
   listen(store.dispatch)
-  vdux(store, state => <App {...state} />, document.body)
+  vdux(store, state => <App {...state} key='app' />, document.body)
 }))

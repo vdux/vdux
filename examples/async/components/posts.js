@@ -20,4 +20,6 @@ function render ({posts = []}) {
  * Exports
  */
 
-export default render
+export default {
+  render
+}

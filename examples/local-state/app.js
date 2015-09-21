@@ -4,30 +4,33 @@
 
 import element from 'vdom-element'
 import {addTodo, removeTodo, markTodoImportant} from './actions'
+import localize from 'vdux-local'
 
 /**
- * handleKeypress
+ * handleKeyup
  */
 
-function handleSubmit (e) {
-  e.preventDefault()
-  console.log('test', e.target)
-}
+function handleKeyup (setState, e) {
+  const text = e.target.value
 
+  return e.which === 13
+    ? [setState({text: ''}), addTodo(text)]
+    : setState({text})
+}
 
 /**
  * Render
  */
 
-function render (props) {
+function render (props, setState) {
+  const {app = {}, todos} = props
+
   return (
     <div>
-      <form ev-submit={handleSubmit}>
-        <input type='text' />
-      </form>
+      <input type='text' ev-keyup={e => handleKeyup(setState, e)} value={app.text} />
       <ul>
         {
-          props.todos.map(todo => <li>{todo.text}</li>)
+          todos.map(todo => <li>{todo.text}</li>)
         }
       </ul>
     </div>
@@ -38,6 +41,6 @@ function render (props) {
  * Exports
  */
 
-export default {
+export default localize({
   render
-}
+})

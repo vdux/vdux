@@ -31,7 +31,7 @@
     "redux-multi": "^0.1.8",
     "standard": "^5.1.0",
     "tape": "^4.2.0",
-    "vdom-element": "^0.1.3",
+    "vdom-element": "^0.1.4",
     "virtual-component": "^0.1.3"
   }
 }

@@ -3,6 +3,7 @@
  */
 
 import {TODO_ADD, TODO_REMOVE, TODO_SET_IMPORTANT} from './actions'
+import ephemeral from 'redux-ephemeral'
 
 /**
  * Reducer
@@ -33,7 +34,8 @@ function reducer (state, action) {
       }
   }
 
-  return state
+  console.log('action', action)
+  return ephemeral(state, action)
 }
 
 /**
