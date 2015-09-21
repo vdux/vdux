@@ -53,6 +53,12 @@ Almost side-effect free, anyway.  You still need to do things like issue request
   * [redux-thunk](https://github.com/gaearon/redux-thunk)
   * [redux-promise](https://github.com/acdlite/redux-promise)
 
+## Ecosystem
+
+  * [virtual-component](https://github.com/ashaffer/virtual-component) - Write virtual-dom with a deku/react like api, with hooks, shouldUpdate, and other civilized things.
+  * [vdom-element](https://github.com/ashaffer/vdom-element) - Thin wrapper around virtual-component and `virtual-dom/h` that gives you a more standard JSX experience.
+  * [vdux-local](https://github.com/ashaffer/vdux-local) - Give yourself some pseudo-local state, all in your single redux state atom.
+
 ## License
 
 The MIT License
