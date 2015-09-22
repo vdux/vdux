@@ -2,7 +2,7 @@
  * Imports
  */
 
-import {TODO_ADD, TODO_REMOVE, TODO_SET_IMPORTANT} from './actions'
+import {TODO_ADD, TODO_REMOVE, TODO_TOGGLE_IMPORTANT} from './actions'
 import ephemeral from 'redux-ephemeral'
 
 /**
@@ -21,15 +21,12 @@ function reducer (state, action) {
         ...state,
         todos: state.todos.filter((todo, idx) => idx !== action.idx)
       }
-    case TODO_SET_IMPORTANT:
+    case TODO_TOGGLE_IMPORTANT:
       return {
         ...state,
-        todos: state.todos
-          .reduce(
-            (acc, todo, idx) => acc.concat(
-              idx === action.idx
-                ? {...todo, important: true}
-                : todo, [])
+        todos: state.todos.map((todo, idx) => idx === action.idx
+            ? {...todo, important: !todo.important}
+            : todo
           )
       }
   }
