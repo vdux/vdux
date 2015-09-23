@@ -4,7 +4,8 @@
 
 const TODO_ADD = 'TODO_ADD'
 const TODO_REMOVE = 'TODO_REMOVE'
-const TODO_TOGGLE_IMPORTANT = 'TODO_TOGGLE_IMPORTANT'
+const TODO_SET_IMPORTANT = 'TODO_SET_IMPORTANT'
+const TODO_SET_COMPLETED = 'TODO_SET_COMPLETED'
 
 /**
  * Action creators
@@ -13,21 +14,38 @@ const TODO_TOGGLE_IMPORTANT = 'TODO_TOGGLE_IMPORTANT'
 function addTodo (text) {
   return {
     type: TODO_ADD,
-    text
+    payload: {
+      text
+    }
   }
 }
 
 function removeTodo (idx) {
   return {
     type: TODO_REMOVE,
-    idx
+    payload: {
+      idx
+    }
   }
 }
 
-function toggleTodoImportant (idx) {
+function setImportant (idx, important) {
   return {
-    type: TODO_TOGGLE_IMPORTANT,
-    idx
+    type: TODO_SET_IMPORTANT,
+    payload: {
+      idx,
+      important
+    }
+  }
+}
+
+function setCompleted (idx, completed) {
+  return {
+    type: TODO_SET_COMPLETED,
+    payload: {
+      idx,
+      completed
+    }
   }
 }
 
@@ -39,10 +57,12 @@ export default {
   // Action creators
   addTodo,
   removeTodo,
-  toggleTodoImportant,
+  setImportant,
+  setCompleted,
 
   // Action types
   TODO_ADD,
   TODO_REMOVE,
-  TODO_TOGGLE_IMPORTANT
+  TODO_SET_IMPORTANT,
+  TODO_SET_COMPLETED
 }

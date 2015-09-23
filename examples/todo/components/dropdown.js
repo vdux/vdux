@@ -44,12 +44,12 @@ function unbindCloseHandler (setState, id) {
  */
 
 function render (props) {
+  const {open, children} = props
+
   return (
-    <div style={{display: props.open ? 'block' : 'none'}}>
-      <ul>
-        {props.children.map(item => <li>{item}</li>)}
-      </ul>
-    </div>
+    <ul class='dropdown' style={{display: open ? 'block' : 'none'}}>
+      {children.map(item => <li>{item}</li>)}
+    </ul>
   )
 }
 

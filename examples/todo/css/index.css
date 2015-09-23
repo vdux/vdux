@@ -211,6 +211,10 @@ label[for='toggle-all'] {
 	text-decoration: line-through;
 }
 
+.todo-list li.important label {
+	color: red;
+}
+
 .todo-list li .destroy {
 	display: none;
 	position: absolute;
@@ -343,6 +347,39 @@ html .clear-completed:active {
 
 .info a:hover {
 	text-decoration: underline;
+}
+
+img.options {
+	float: right;
+	margin-top:5px;
+	width: 20px;
+	cursor: pointer;
+}
+
+.dropdown {
+	right: 0;
+  color: #6a6a6a;
+  width: 180px;
+	border: 1px solid #bbb;
+	background: #fff;
+	position: absolute;
+	top: 100%;
+	-webkit-box-shadow: 0 0 20px 0 rgba(52,52,52,0.2);
+	box-shadow: 0 0 20px 0 rgba(52,52,52,0.2);
+	list-style: none;
+	margin: -3px 0 0;
+  margin-top: 5px;
+	padding: 0;
+	z-index: 1;
+}
+
+.dropdown > li {
+	padding: 6px 12px;
+	cursor: pointer;
+}
+
+.dropdown > li:hover {
+	background-color: #bbb;
 }
 
 /*

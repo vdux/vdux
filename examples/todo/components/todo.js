@@ -5,7 +5,7 @@
 import localize from 'vdux-local'
 import element from 'vdom-element'
 import Dropdown from './dropdown'
-import {removeTodo, toggleTodoImportant} from '../actions'
+import {removeTodo, setImportant, setCompleted} from '../actions'
 
 /**
  * Render
@@ -16,19 +16,17 @@ function render (props) {
   const dropdownKey = props.key + '.dropdown'
 
   return (
-    <li class={completed ? 'completed' : ''}>
+    <li class={{completed, important}}>
       <div class='view'>
-        <input class='toggle' type='checkbox' />
+        <input class='toggle' type='checkbox' ev-click={() => setCompleted(idx, !completed)} />
         <label style={{color: important ? 'red' : 'black'}}>
           {text}
+          <img class='options' src='css/options.png' ev-click={() => Dropdown.toggle(dropdownKey)} />
+          <Dropdown {...dropdown} key={dropdownKey}>
+            <div ev-click={() => setImportant(idx, !important)}>Important</div>
+            <div ev-click={() => removeTodo(idx)}>Remove</div>
+          </Dropdown>
         </label>
-        <span ev-click={e => Dropdown.toggle(dropdownKey)} style={{marginLeft: '12px', color: 'blue'}} >
-          options
-        </span>
-        <Dropdown {...dropdown} key={dropdownKey}>
-          <div ev-click={() => toggleTodoImportant(idx)}>Mark important</div>
-          <div ev-click={() => removeTodo(idx)}>Remove</div>
-        </Dropdown>
       </div>
     </li>
   )
