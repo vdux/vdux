@@ -34,6 +34,7 @@
     "standard": "^5.1.0",
     "tape": "^4.2.0",
     "vdom-element": "^0.2.1",
-    "virtual-component": "^0.2.0"
+    "virtual-component": "^0.2.1",
+    "vdux-local": "^0.2.0"
   }
 }
