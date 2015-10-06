@@ -8,34 +8,53 @@ import bind from 'bind-effect'
 import element from 'vdom-element'
 
 /**
- * Action types
+ * Actions
  */
 
 const TOGGLE = 'TOGGLE_DROPDOWN'
+const CLOSE = 'CLOSE_DROPDOWN'
+const SET_HANDLER_ID = 'SET_HANDLER_ID'
+
+const toggle = localAction(TOGGLE)
+const close = localAction(CLOSE)
+const setHandlerId = localAction(SET_HANDLER_ID)
+
+/**
+ * initialState
+ */
+
+function initialState () {
+  return {
+    open: false
+  }
+}
 
 /**
  * beforeUpdate
  */
 
-function beforeUpdate (prevProps, nextProps, setState) {
-  if (!prevProps.open && nextProps.open) {
-    return bindCloseHandler(setState)
-  } else if(prevProps.open && !nextProps.open) {
-    return unbindCloseHandler(setState, nextProps.handlerId)
+function beforeUpdate (prevProps, nextProps) {
+  const prevState = prevProps.state
+  const nextState = nextProps.state
+
+  if (!prevState.open && nextState.open) {
+    return bindCloseHandler(nextProps.key)
+  } else if(prevState.open && !nextState.open) {
+    return unbindCloseHandler(nextProps.key, nextState.handlerId)
   }
 }
 
-function bindCloseHandler (setState) {
+function bindCloseHandler (key) {
   return bind(
-    handleOnce('click', () => setState({open: false})),
-    id => setState({handlerId: id})
+    handleOnce('click', () => close(key)),
+    id => setHandlerId(key, id)
   )
 }
 
-function unbindCloseHandler (setState, id) {
+function unbindCloseHandler (key, id) {
   return [
     unhandle('click', id),
-    setState({handlerId: null})
+    setHandlerId(key, null)
   ]
 }
 
@@ -43,8 +62,8 @@ function unbindCloseHandler (setState, id) {
  * Render
  */
 
-function render (props) {
-  const {open, children} = props
+function render ({children, state}) {
+  const {open} = state
 
   return (
     <ul class='dropdown' style={{display: open ? 'block' : 'none'}}>
@@ -64,22 +83,27 @@ function reducer (state, action) {
         ...state,
         open: !state.open
       }
+    case CLOSE:
+      return {
+        ...state,
+        open: false
+      }
+    case SET_HANDLER_ID:
+      return {
+        ...state,
+        handlerId: action.payload
+      }
   }
 
   return state
 }
 
 /**
- * Actions
- */
-
-const toggle = localAction(TOGGLE)
-
-/**
  * Exports
  */
 
 export default localize({
+  initialState,
   beforeUpdate,
   render,
   reducer,

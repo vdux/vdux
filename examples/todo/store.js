@@ -6,6 +6,7 @@ import {createStore, applyMiddleware} from 'redux'
 import reducer from './reducer'
 import effects from 'redux-effects'
 import events from 'redux-effects-events'
+import location from 'redux-effects-location'
 import multi from 'redux-multi'
 import logger from 'redux-logger'
 
@@ -17,6 +18,7 @@ import logger from 'redux-logger'
    multi,
    effects,
    events(),
+   location(),
    logger
  ]
 

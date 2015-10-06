@@ -215,7 +215,7 @@ label[for='toggle-all'] {
 	color: red;
 }
 
-.todo-list li .destroy {
+.todo-list li .options {
 	display: none;
 	position: absolute;
 	top: 0;
@@ -238,7 +238,7 @@ label[for='toggle-all'] {
 	content: '×';
 }
 
-.todo-list li:hover .destroy {
+.todo-list li:hover .options {
 	display: block;
 }
 

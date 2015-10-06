@@ -5,9 +5,14 @@
 import {
   TODO_ADD,
   TODO_REMOVE,
+  TODO_SET_TEXT,
   TODO_SET_IMPORTANT,
-  TODO_SET_COMPLETED
+  TODO_SET_COMPLETED,
+  SET_ALL_COMPLETED,
+  CLEAR_COMPLETED,
+  URL_DID_UPDATE
 } from './actions'
+
 import ephemeral from 'redux-ephemeral'
 
 /**
@@ -16,35 +21,77 @@ import ephemeral from 'redux-ephemeral'
 
 function reducer (state, action) {
   switch (action.type) {
-    case TODO_ADD:
+    case TODO_ADD: {
+      const {text} = action.payload
       return {
         ...state,
-        todos: [...state.todos, {text: action.payload.text, important: false}]
+        todos: [...state.todos, {text, important: false, completed: false}]
       }
-    case TODO_REMOVE:
+    }
+    case TODO_REMOVE: {
       return {
         ...state,
         todos: state.todos.filter((todo, idx) => idx !== action.payload.idx)
       }
-    case TODO_SET_IMPORTANT:
+    }
+    case TODO_SET_TEXT: {
+      const {idx, text} = action.payload
+
       return {
         ...state,
-        todos: state.todos.map((todo, idx) => idx === action.payload.idx
-            ? {...todo, important: action.payload.important}
-            : todo
-          )
+        todos: updateArrayItem(state.todos, idx, todo => ({...todo, text}))
       }
-    case TODO_SET_COMPLETED:
+    }
+    case TODO_SET_IMPORTANT: {
+      const {idx, important} = action.payload
+
       return {
         ...state,
-        todos: state.todos.map((todo, idx) => idx === action.payload.idx
-            ? {...todo, completed: action.payload.completed}
-            : todo
-        )
+        todos: updateArrayItem(state.todos, idx, todo => ({...todo, important}))
       }
+    }
+    case TODO_SET_COMPLETED: {
+      const {idx, completed} = action.payload
+
+      return {
+        ...state,
+        todos: updateArrayItem(state.todos, idx, todo => ({...todo, completed}))
+      }
+    }
+    case SET_ALL_COMPLETED: {
+      const {completed} = action.payload
+
+      return {
+        ...state,
+        todos: state.todos.map(todo => ({...todo, completed}))
+      }
+    }
+    case CLEAR_COMPLETED: {
+      return {
+        ...state,
+        todos: state.todos.filter(todo => !todo.completed)
+      }
+    }
+    case URL_DID_UPDATE: {
+      return {
+        ...state,
+        url: action.payload.url
+      }
+    }
   }
 
   return ephemeral(state, action)
+}
+
+/**
+ * Utilities
+ */
+
+function updateArrayItem (arr, idx, fn) {
+  return arr.map((item, curIdx) =>
+    idx === curIdx
+      ? fn(item)
+      : item)
 }
 
 /**

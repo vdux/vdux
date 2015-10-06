@@ -9,6 +9,7 @@ import {listen} from 'virtual-component'
 import {handleOnce} from 'declarative-events'
 import element from 'vdom-element'
 import App from './app'
+import {initializeRouter} from './actions'
 
 /**
  * Setup store
@@ -24,5 +25,6 @@ const store = createStore({
 
 store.dispatch(handleOnce('domready', () => {
   listen(store.dispatch)
-  vdux(store, state => <App {...state} key='app' />, document.body)
+  store.dispatch(initializeRouter())
+  vdux(store, state => <App key='app' state={state.app} {...state} />, document.body)
 }))
