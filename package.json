@@ -2,7 +2,7 @@
   "name": "vdux",
   "description": "Stateless virtual dom &lt;-&gt; Redux",
   "repository": "git://github.com/ashaffer/vdux.git",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "license": "MIT",
   "main": "lib/index.js",
   "scripts": {
