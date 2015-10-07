@@ -6,7 +6,7 @@ import vdux from '../../src'
 import app from './app'
 import createStore from './store'
 import {listen} from 'virtual-component'
-import {handleOnce} from 'declarative-events'
+import {handleOnce} from 'redux-effects-events'
 import element from 'vdom-element'
 import App from './app'
 

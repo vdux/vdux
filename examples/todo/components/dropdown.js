@@ -3,8 +3,8 @@
  */
 
 import localize, {localAction} from 'vdux-local'
-import {handleOnce, unhandle} from 'declarative-events'
-import bind from 'bind-effect'
+import {handleOnce, unhandle} from 'redux-effects-events'
+import {bind} from 'redux-effects'
 import element from 'vdom-element'
 
 /**

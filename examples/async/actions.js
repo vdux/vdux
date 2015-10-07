@@ -2,8 +2,8 @@
  * Imports
  */
 
- import bind from 'bind-effect'
- import fetch from 'declarative-fetch'
+import {bind} from 'redux-effects'
+import {fetch} from 'redux-effects-fetch'
 
 /**
  * Actions

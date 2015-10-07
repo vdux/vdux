@@ -2,7 +2,7 @@
  * Imports
  */
 
-import {bindUrl} from 'declarative-location'
+import {bindUrl} from 'redux-effects-location'
 
 /**
  * Types
