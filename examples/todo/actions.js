@@ -2,7 +2,10 @@
  * Imports
  */
 
+import omit from 'object.omit'
+import {bind} from 'redux-effects'
 import {bindUrl} from 'redux-effects-location'
+import {setItem, getItem} from 'redux-effects-localstorage'
 
 /**
  * Types
@@ -16,6 +19,13 @@ const TODO_SET_COMPLETED = 'TODO_SET_COMPLETED'
 const SET_ALL_COMPLETED = 'SET_ALL_COMPLETED'
 const CLEAR_COMPLETED = 'CLEAR_COMPLETED'
 const URL_DID_UPDATE = 'URL_DID_UPDATE'
+const HYDRATE_STATE = 'HYDRATE_STATE'
+
+/**
+ * Vars
+ */
+
+const localStorageKey = 'todos-vdux'
 
 /**
  * Action creators
@@ -97,6 +107,22 @@ function clearCompleted () {
   }
 }
 
+function persistTodos (state) {
+  return setItem(localStorageKey, JSON.stringify(state.todos))
+}
+
+function hydrateTodos (state) {
+  return bind(getItem(localStorageKey), todosStr => hydrateState({todos: JSON.parse(todosStr)}))
+}
+
+function hydrateState (state) {
+  return {
+    type: HYDRATE_STATE,
+    payload: state
+  }
+}
+
+
 /**
  * Exports
  */
@@ -111,6 +137,8 @@ export default {
   setAllCompleted,
   clearCompleted,
   initializeRouter,
+  hydrateTodos,
+  persistTodos,
 
   // Action types
   TODO_ADD,
@@ -120,5 +148,6 @@ export default {
   TODO_SET_COMPLETED,
   SET_ALL_COMPLETED,
   CLEAR_COMPLETED,
-  URL_DID_UPDATE
+  URL_DID_UPDATE,
+  HYDRATE_STATE
 }

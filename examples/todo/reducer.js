@@ -10,7 +10,8 @@ import {
   TODO_SET_COMPLETED,
   SET_ALL_COMPLETED,
   CLEAR_COMPLETED,
-  URL_DID_UPDATE
+  URL_DID_UPDATE,
+  HYDRATE_STATE
 } from './actions'
 
 import ephemeral from 'redux-ephemeral'
@@ -21,6 +22,12 @@ import ephemeral from 'redux-ephemeral'
 
 function reducer (state, action) {
   switch (action.type) {
+    case HYDRATE_STATE: {
+      return {
+        ...state,
+        ...action.payload
+      }
+    }
     case TODO_ADD: {
       const {text} = action.payload
       return {

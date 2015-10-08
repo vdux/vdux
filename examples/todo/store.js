@@ -7,6 +7,7 @@ import reducer from './reducer'
 import effects from 'redux-effects'
 import events from 'redux-effects-events'
 import location from 'redux-effects-location'
+import localstorage from 'redux-effects-localstorage'
 import multi from 'redux-multi'
 import logger from 'redux-logger'
 
@@ -17,6 +18,7 @@ import logger from 'redux-logger'
  const middleware = [
    multi,
    effects,
+   localstorage(window.localStorage),
    events(),
    location(),
    logger
