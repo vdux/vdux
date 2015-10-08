@@ -2,7 +2,6 @@
  * Imports
  */
 
-import omit from 'object.omit'
 import {bind} from 'redux-effects'
 import {bindUrl} from 'redux-effects-location'
 import {setItem, getItem} from 'redux-effects-localstorage'
@@ -30,6 +29,13 @@ const localStorageKey = 'todos-vdux'
 /**
  * Action creators
  */
+
+function initializeApp () {
+  return [
+    hydrateTodos(),
+    initializeRouter()
+  ]
+}
 
 function urlDidUpdate (url) {
   return {
@@ -107,11 +113,11 @@ function clearCompleted () {
   }
 }
 
-function persistTodos (state) {
-  return setItem(localStorageKey, JSON.stringify(state.todos))
+function persistTodos (todos) {
+  return setItem(localStorageKey, JSON.stringify(todos))
 }
 
-function hydrateTodos (state) {
+function hydrateTodos () {
   return bind(getItem(localStorageKey), todosStr => hydrateState({todos: JSON.parse(todosStr)}))
 }
 
@@ -136,9 +142,8 @@ export default {
   setCompleted,
   setAllCompleted,
   clearCompleted,
-  initializeRouter,
-  hydrateTodos,
   persistTodos,
+  initializeApp,
 
   // Action types
   TODO_ADD,
