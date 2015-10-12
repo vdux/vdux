@@ -11,7 +11,7 @@ Stateless virtual dom &lt;-&gt; Redux
 
 ### Running the examples
 
-    $ cd examples/basic && budo --live -t babelify index.js
+    $ cd examples/basic && budo --live index.js -- -t babelify
 
 ## Setup
 
