@@ -118,7 +118,7 @@ function persistTodos (todos) {
 }
 
 function hydrateTodos () {
-  return bind(getItem(localStorageKey), todosStr => hydrateState({todos: JSON.parse(todosStr)}))
+  return bind(getItem(localStorageKey), todosStr => todosStr && hydrateState({todos: JSON.parse(todosStr)}))
 }
 
 function hydrateState (state) {
