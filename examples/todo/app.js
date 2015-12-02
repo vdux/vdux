@@ -2,9 +2,9 @@
  * Imports
  */
 
-import element from 'vdom-element'
-import localize, {localAction} from 'vdux-local'
+import element from 'virtex-element'
 import {addTodo, removeTodo, markTodoImportant, setAllCompleted} from './actions'
+import {localAction} from 'virtex-local'
 import Todo from './components/todo'
 import Footer from './components/footer'
 
@@ -13,13 +13,6 @@ import Footer from './components/footer'
  */
 
 const ENTER_KEY = 13
-
-/**
- * Actions
- */
-
-const SET_TEXT = 'SET_TEXT'
-const setText = localAction(SET_TEXT)
 
 /**
  * initialState
@@ -36,7 +29,9 @@ function initialState () {
  * Render
  */
 
-function render ({key, url, todos, state}, childState) {
+function render ({props, state, actions}) {
+  const {url, todos} = props
+  const {setText} = actions
   const numCompleted = todos.reduce((acc, todo) => acc + (todo.completed ? 1 : 0), 0)
   const allDone = numCompleted === todos.length
   const itemsLeft = todos.length - numCompleted
@@ -50,19 +45,19 @@ function render ({key, url, todos, state}, childState) {
           class='new-todo'
           autofocus
           type='text'
-          ev-keyup={handleKeyup}
+          onKeyUp={handleKeyup}
           value={state.text}
           placeholder='What needs to be done?' />
       </header>
       <section id='main' class='main' style={{display: todos.length ? 'block' : 'none'}}>
-        <input class='toggle-all' type='checkbox' ev-change={e => setAllCompleted(e.target.checked)} checked={allDone} />
+        <input class='toggle-all' type='checkbox' onChange={e => setAllCompleted(e.target.checked)} checked={allDone} />
         <label for='toggle-all'>
           Mark all as complete
         </label>
         <ul class='todo-list'>
           {
             todos.map((todo, i) => isShown(todo)
-                ? <Todo {...childState('todos', i)} idx={i} {...todo} />
+                ? <Todo idx={i} {...todo} />
                 : null)
           }
         </ul>
@@ -78,8 +73,8 @@ function render ({key, url, todos, state}, childState) {
   function handleKeyup (e) {
     const text = e.target.value.trim()
     return text && e.which === ENTER_KEY
-      ? [setText(key, ''), addTodo(text)]
-      : setText(key, text)
+      ? [setText(''), addTodo(text)]
+      : setText(text)
   }
 
   function isShown (todo) {
@@ -93,6 +88,12 @@ function render ({key, url, todos, state}, childState) {
     }
   }
 }
+
+/**
+ * Actions
+ */
+
+const SET_TEXT = 'SET_TEXT'
 
 /**
  * Reducer
@@ -114,8 +115,11 @@ function reducer (state, action) {
  * Exports
  */
 
-export default localize({
+export default {
   initialState,
   render,
-  reducer
-})
+  reducer,
+  actions: {
+    setText: localAction(SET_TEXT)
+  }
+}

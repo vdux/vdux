@@ -2,10 +2,10 @@
  * Imports
  */
 
-import localize, {localAction} from 'vdux-local'
 import {handleOnce, unhandle} from 'redux-effects-events'
+import {localAction} from 'virtex-local'
 import {bind} from 'redux-effects'
-import element from 'vdom-element'
+import element from 'virtex-element'
 
 /**
  * Actions
@@ -14,10 +14,6 @@ import element from 'vdom-element'
 const TOGGLE = 'TOGGLE_DROPDOWN'
 const CLOSE = 'CLOSE_DROPDOWN'
 const SET_HANDLER_ID = 'SET_HANDLER_ID'
-
-const toggle = localAction(TOGGLE)
-const close = localAction(CLOSE)
-const setHandlerId = localAction(SET_HANDLER_ID)
 
 /**
  * initialState
@@ -33,28 +29,25 @@ function initialState () {
  * beforeUpdate
  */
 
-function beforeUpdate (prevProps, nextProps) {
-  const prevState = prevProps.state
-  const nextState = nextProps.state
-
-  if (!prevState.open && nextState.open) {
-    return bindCloseHandler(nextProps.key)
-  } else if(prevState.open && !nextState.open) {
-    return unbindCloseHandler(nextProps.key, nextState.handlerId)
+function beforeUpdate (prev, next) {
+  if (!prev.state.open && next.state.open) {
+    return bindCloseHandler(next.actions)
+  } else if(prev.state.open && !next.state.open) {
+    return unbindCloseHandler(next.actions, next.state.handlerId)
   }
 }
 
-function bindCloseHandler (key) {
+function bindCloseHandler ({close, setHandlerId}) {
   return bind(
-    handleOnce('click', () => close(key)),
-    id => setHandlerId(key, id)
+    handleOnce('click', close),
+    setHandlerId
   )
 }
 
-function unbindCloseHandler (key, id) {
+function unbindCloseHandler ({setHandlerId}, id) {
   return [
     unhandle('click', id),
-    setHandlerId(key, null)
+    setHandlerId(null)
   ]
 }
 
@@ -102,10 +95,14 @@ function reducer (state, action) {
  * Exports
  */
 
-export default localize({
+export default {
   initialState,
   beforeUpdate,
   render,
   reducer,
-  toggle
-})
+  actions: {
+    toggle: localAction(TOGGLE),
+    close: localAction(CLOSE),
+    setHandlerId: localAction(SET_HANDLER_ID)
+  }
+}

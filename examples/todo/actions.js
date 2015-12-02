@@ -133,7 +133,7 @@ function hydrateState (state) {
  * Exports
  */
 
-export default {
+export {
   // Action creators
   addTodo,
   removeTodo,

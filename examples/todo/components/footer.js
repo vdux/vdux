@@ -2,7 +2,7 @@
  * Imports
  */
 
-import element from 'vdom-element'
+import element from 'virtex-element'
 import {clearCompleted} from '../actions'
 
 /**
@@ -19,7 +19,8 @@ const filters = {
  * Render
  */
 
-function render ({itemsLeft = 0, completed = 0, active}) {
+function render ({props}) {
+  const {itemsLeft = 0, completed = 0, active} = props
   const itemStr = itemsLeft === 1 ? 'item' : 'items'
 
   return (
@@ -34,7 +35,7 @@ function render ({itemsLeft = 0, completed = 0, active}) {
           )
         }
       </ul>
-      <button class='clear-completed' ev-click={clearCompleted} style={{display: completed ? 'block' : 'none'}}>
+      <button class='clear-completed' onClick={clearCompleted} style={{display: completed ? 'block' : 'none'}}>
         Clear Completed
       </button>
     </footer>

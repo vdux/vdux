@@ -10,15 +10,18 @@
     "postpublish": "rm -rf lib"
   },
   "dependencies": {
-    "compose-function": "^2.0.0",
     "delegant": "^0.1.3",
     "ev-store": "^7.0.0",
     "virtual-dom": "^2.1.1"
   },
   "devDependencies": {
-    "babel": "^5.8.21",
+    "babel": "^6.0.15",
+    "babel-core": "^6.1.2",
+    "babel-plugin-transform-react-jsx": "^6.0.18",
+    "babel-preset-es2015": "^6.1.2",
+    "babel-preset-stage-2": "^6.1.2",
     "babel-tape-runner": "^1.2.0",
-    "babelify": "^6.3.0",
+    "babelify": "^7.2.0",
     "budo": "^4.2.1",
     "enroute": "^1.0.1",
     "redux": "^3.0.0",
@@ -27,12 +30,15 @@
     "redux-effects-fetch": "^0.3.3",
     "redux-effects-localstorage": "^0.1.7",
     "redux-effects-location": "^0.1.11",
+    "redux-ephemeral": "^0.1.3",
     "redux-logger": "^1.0.8",
     "redux-multi": "^0.1.8",
     "standard": "^5.1.0",
     "tape": "^4.2.0",
     "vdom-element": "^0.2.1",
     "vdux-local": "^0.2.0",
+    "virtex-dom": "^0.1.4",
+    "virtex-element": "^0.1.1",
     "virtual-component": "^0.2.1"
   }
 }

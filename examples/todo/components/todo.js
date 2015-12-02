@@ -2,8 +2,8 @@
  * Imports
  */
 
-import localize, {localAction} from 'vdux-local'
-import element from 'vdom-element'
+import element from 'virtex-element'
+import {localAction} from 'virtex-local'
 import Dropdown from './dropdown'
 import {removeTodo, setImportant, setCompleted, setTodoText} from '../actions'
 
@@ -21,9 +21,6 @@ const ESCAPE_KEY = 27
 const BEGIN_EDIT = 'BEGIN_EDIT'
 const CANCEL_EDIT = 'CANCEL_EDIT'
 
-const beginEdit = localAction(BEGIN_EDIT)
-const cancelEdit = localAction(CANCEL_EDIT)
-
 /**
  * Initial state
  */
@@ -38,45 +35,31 @@ function initialState () {
  * Render
  */
 
-function render ({idx, key, text, important, completed, state}, childState) {
+function render ({state, props, actions, ref}) {
+  const {text, important, completed} = props
+  const {beginEdit, toggleDropdown, submitEdit, handleKeydown, toggleCompleted, toggleImportant, remove} = actions
   const {editing} = state
 
   return (
     <li class={{completed, important, editing}}>
-      <div class='view' ev-dblclick={() => beginEdit(key)}>
-        <input class='toggle' type='checkbox' ev-change={() => setCompleted(idx, !completed)} checked={completed} />
+      <div class='view' onDblClick={beginEdit}>
+        <input class='toggle' type='checkbox' onChange={toggleCompleted} checked={completed} />
         <label style={{color: important ? 'red' : 'black'}}>
           {text}
-          <img class='options' src='css/options.png' ev-click={() => Dropdown.toggle(`${key}.dropdown`)} />
-          <Dropdown {...childState('dropdown')}>
-            <div ev-click={() => setImportant(idx, !important)}>Important</div>
-            <div ev-click={() => removeTodo(idx)}>Remove</div>
+          <img class='options' src='css/options.png' onClick={toggleDropdown} />
+          <Dropdown ref={ref('dropdown')}>
+            <div onClick={toggleImportant}>Important</div>
+            <div onClick={remove}>Remove</div>
           </Dropdown>
         </label>
       </div>
       <input class='edit'
         focused={editing}
         value={text}
-        ev-blur={e => submitEdit(e.currentTarget.value)}
-        ev-keydown={handleKeydown} />
+        onBlur={submitEdit}
+        onKeyDown={handleKeydown} />
     </li>
   )
-
-  function handleKeydown (e) {
-    switch (e.which) {
-      case ENTER_KEY:
-        return submitEdit(e.currentTarget.value)
-      case ESCAPE_KEY:
-        return cancelEdit(key)
-    }
-  }
-
-  function submitEdit (str) {
-    str = str.trim()
-    return str
-      ? [setTodoText(idx, str), cancelEdit(key)]
-      : cancelEdit(key)
-  }
 }
 
 /**
@@ -102,8 +85,37 @@ function reducer (state, action) {
  * Exports
  */
 
-export default localize({
+export default {
   initialState,
   render,
-  reducer
-})
+  reducer,
+  actions: {
+    beginEdit: localAction(BEGIN_EDIT),
+    cancelEdit: localAction(CANCEL_EDIT),
+    remove: ({props}) => removeTodo(props.idx),
+    toggleCompleted: ({props}) => setCompleted(props.idx, !props.completed),
+    toggleImportant: ({props}) => setImportant(props.idx, !props.important),
+    handleKeydown: ({actions}, e) => {
+      const {submitEdit, cancelEdit} = actions
+
+      switch (e.which) {
+        case ENTER_KEY:
+          return submitEdit(e.currentTarget.value)
+        case ESCAPE_KEY:
+          return cancelEdit()
+      }
+    },
+    submitEdit: ({actions, props}, e) => {
+      const str = e.currentTarget.value.trim()
+      const {cancelEdit} = actions
+      const {idx} = props
+
+      return str
+        ? [setTodoText(idx, str), cancelEdit()]
+        : cancelEdit()
+    },
+    toggleDropdown ({refs}) {
+      return refs.dropdown.toggle()
+    }
+  }
+}

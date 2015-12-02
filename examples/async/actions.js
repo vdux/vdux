@@ -48,7 +48,7 @@ function selectReddit (reddit) {
  * Exports
  */
 
-export default {
+export {
   // Action creators
   requestPosts,
   selectReddit,

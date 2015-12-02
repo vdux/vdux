@@ -2,15 +2,13 @@
  * Imports
  */
 
-import element from 'vdom-element'
+import element from 'virtex-element'
 
 /**
  * Render
  */
 
-function render (props) {
-  const {posts = []} = props
-
+function render ({posts = []}) {
   return (
     <div>
       {posts.map(post => <li>{post.title}</li>)}

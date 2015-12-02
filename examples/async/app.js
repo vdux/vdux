@@ -2,7 +2,7 @@
  * Imports
  */
 
-import element from 'vdom-element'
+import element from 'virtex-element'
 import {requestPosts, selectReddit} from './actions'
 import Posts from './components/posts'
 import Picker from './components/picker'
@@ -40,13 +40,13 @@ function render (props) {
         <span>
           {`Last updated at ${lastUpdatedStr}`}.{' '}
         </span>
-        <a href='#' ev-click={() => requestPosts(reddit)}>
+        <a href='#' onClick={() => requestPosts(reddit)}>
           Refresh
         </a>
       </p>
-      {loading && <h2>Loading...</h2>}
-      {!loading && posts.length === 0 && <h2>Empty.</h2>}
-      {!loading && posts.length > 0 && <Posts posts={posts} />}
+      {loading ? <h2>Loading...</h2> : ''}
+      {!loading && posts.length === 0 ? <h2>Empty.</h2> : ''}
+      {!loading && posts.length > 0 ? <Posts posts={posts} />: ''}
     </div>
   )
 }

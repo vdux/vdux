@@ -4,9 +4,9 @@
 
 import vdux from '../../src'
 import createStore from './store'
-import {listen} from 'virtual-component'
 import {handleOnce} from 'redux-effects-events'
-import element from 'vdom-element'
+import element from 'virtex-element'
+import virtex from 'virtex'
 import App from './app'
 import {initializeApp} from './actions'
 
@@ -15,7 +15,10 @@ import {initializeApp} from './actions'
  */
 
 const store = createStore({
-  todos: []
+  todos: [],
+  0: {
+    0: {}
+  }
 })
 
 /**
@@ -23,7 +26,6 @@ const store = createStore({
  */
 
 store.dispatch(handleOnce('domready', () => {
-  listen(store.dispatch)
   store.dispatch(initializeApp())
-  vdux(store, state => <App key='app' state={state.app} {...state} />, document.body)
+  vdux(store, virtex(store.dispatch), state => <App todos={state.todos} url={state.url} />, document.body)
 }))

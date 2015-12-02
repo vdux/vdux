@@ -2,32 +2,36 @@
  * Imports
  */
 
-import delegate from 'delegant'
-import compose from 'compose-function'
-import {diff, patch, create} from 'virtual-dom'
+import delegant from 'delegant'
 
 /**
  * vdux
  */
 
-function vdux (store, app, node) {
+function vdux (store, {create, update}, app, node) {
+  /**
+   * Create the Virtual DOM <-> Redux cycle
+   */
+
+  const unsubscribe = store.subscribe(sync)
+  const undelegate = delegant(node, action => action && store.dispatch(action))
+
   /**
    * Render the VDOM tree
    */
 
   let tree = render()
   let rootNode = create(tree)
-
   node.appendChild(rootNode)
 
   /**
-   * Create the Virtual DOM <-> Redux cycle
+   * Return an unbind function
    */
 
-  return compose(
-    delegate(node, action => action && store.dispatch(action)),
-    store.subscribe(update)
-  )
+  return () => {
+    unsubscribe()
+    undelegate()
+  }
 
   /**
    * Render a new virtual dom
@@ -41,11 +45,18 @@ function vdux (store, app, node) {
    * Sync the virtual dom and the actual dom
    */
 
-  function update () {
-    const newTree = render()
+  let pending = false
+  function sync () {
+    // Ensure we don't get re-entrant/duplicate renders
+    if (pending) return
+    pending = true
 
-    rootNode = patch(rootNode, diff(tree, newTree))
-    tree = newTree
+    setTimeout(() => {
+      pending = false
+      const newTree = render()
+      update(tree, newTree, rootNode)
+      tree = newTree
+    })
   }
 }
 

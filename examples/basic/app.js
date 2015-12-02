@@ -2,14 +2,14 @@
  * Imports
  */
 
-import h from 'virtual-dom/h'
+import h from 'virtex-element'
 
 /**
  * App
  */
 
 function app (state) {
-  return h('div', {'ev-click': increment}, ['Counter: ' + state.counter])
+  return h('div', {onClick: increment}, ['Counter: ' + state.counter])
 }
 
 function increment () {

@@ -1,4 +1,7 @@
 {
-  "jsxPragma": "element",
-  "optional": ["es7.objectRestSpread"]
+  "presets": ["es2015", "stage-2"],
+  "comments": false,
+  "plugins": [
+    ["transform-react-jsx", {"pragma": "element"}]
+  ]
 }
