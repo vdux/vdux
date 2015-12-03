@@ -31,7 +31,6 @@ function initialState () {
 
 function render ({props, state, actions}) {
   const {url, todos} = props
-  const {setText} = actions
   const numCompleted = todos.reduce((acc, todo) => acc + (todo.completed ? 1 : 0), 0)
   const allDone = numCompleted === todos.length
   const itemsLeft = todos.length - numCompleted
@@ -45,12 +44,13 @@ function render ({props, state, actions}) {
           class='new-todo'
           autofocus
           type='text'
-          onKeyUp={handleKeyup}
+          onKeyUp={actions.setText}
+          onKeyDown={actions.maybeSubmit}
           value={state.text}
           placeholder='What needs to be done?' />
       </header>
       <section id='main' class='main' style={{display: todos.length ? 'block' : 'none'}}>
-        <input class='toggle-all' type='checkbox' onChange={e => setAllCompleted(e.target.checked)} checked={allDone} />
+        <input class='toggle-all' type='checkbox' onChange={actions.toggleAll} checked={allDone} />
         <label for='toggle-all'>
           Mark all as complete
         </label>
@@ -70,13 +70,6 @@ function render ({props, state, actions}) {
     </section>
   )
 
-  function handleKeyup (e) {
-    const text = e.target.value.trim()
-    return text && e.which === ENTER_KEY
-      ? [setText(''), addTodo(text)]
-      : setText(text)
-  }
-
   function isShown (todo) {
     switch (activeFilter) {
       case 'completed':
@@ -88,12 +81,6 @@ function render ({props, state, actions}) {
     }
   }
 }
-
-/**
- * Actions
- */
-
-const SET_TEXT = 'SET_TEXT'
 
 /**
  * Reducer
@@ -112,6 +99,33 @@ function reducer (state, action) {
 }
 
 /**
+ * Local actions
+ */
+
+const SET_TEXT = 'SET_TEXT'
+
+const setText = localAction(SET_TEXT)
+
+function handleKeyup ({actions}, e) {
+  return actions.setText(e.target.value.trim())
+}
+
+function maybeSubmit ({actions}, e) {
+  const text = e.target.value.trim()
+
+  if (text && e.which === ENTER_KEY) {
+    return [
+      actions.setText(''),
+      addTodo(text)
+    ]
+  }
+}
+
+function toggleAll (model, e) {
+  return setAllCompleted(e.target.checked)
+}
+
+/**
  * Exports
  */
 
@@ -120,6 +134,9 @@ export default {
   render,
   reducer,
   actions: {
-    setText: localAction(SET_TEXT)
+    setText,
+    handleKeyup,
+    maybeSubmit,
+    toggleAll
   }
 }

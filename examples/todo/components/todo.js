@@ -15,13 +15,6 @@ const ENTER_KEY = 13
 const ESCAPE_KEY = 27
 
 /**
- * Local actions
- */
-
-const BEGIN_EDIT = 'BEGIN_EDIT'
-const CANCEL_EDIT = 'CANCEL_EDIT'
-
-/**
  * Initial state
  */
 
@@ -36,28 +29,27 @@ function initialState () {
  */
 
 function render ({state, props, actions, ref}) {
-  const {text, important, completed} = props
-  const {beginEdit, toggleDropdown, submitEdit, handleKeydown, toggleCompleted, toggleImportant, remove} = actions
+  const {text, important, completed, idx} = props
   const {editing} = state
 
   return (
     <li class={{completed, important, editing}}>
-      <div class='view' onDblClick={beginEdit}>
-        <input class='toggle' type='checkbox' onChange={toggleCompleted} checked={completed} />
+      <div class='view' onDblClick={actions.beginEdit}>
+        <input class='toggle' type='checkbox' onChange={actions.toggleCompleted} checked={completed} />
         <label style={{color: important ? 'red' : 'black'}}>
           {text}
-          <img class='options' src='css/options.png' onClick={toggleDropdown} />
+          <img class='options' src='css/options.png' onClick={actions.toggleDropdown} />
           <Dropdown ref={ref('dropdown')}>
-            <div onClick={toggleImportant}>Important</div>
-            <div onClick={remove}>Remove</div>
+            <div onClick={actions.toggleImportant}>Important</div>
+            <div onClick={actions.remove}>Remove</div>
           </Dropdown>
         </label>
       </div>
       <input class='edit'
         focused={editing}
         value={text}
-        onBlur={submitEdit}
-        onKeyDown={handleKeydown} />
+        onBlur={actions.submitEdit}
+        onKeyDown={actions.handleKeydown} />
     </li>
   )
 }
@@ -82,6 +74,50 @@ function reducer (state, action) {
 }
 
 /**
+ * Local actions
+ */
+
+const BEGIN_EDIT = 'BEGIN_EDIT'
+const CANCEL_EDIT = 'CANCEL_EDIT'
+
+const beginEdit = localAction(BEGIN_EDIT)
+const cancelEdit = localAction(CANCEL_EDIT)
+
+function toggleCompleted ({props}) {
+  return setCompleted(props.idx, !props.completed)
+}
+
+function toggleImportant ({props}) {
+  return setImportant(props.idx, !props.important)
+}
+
+function remove ({props}) {
+  return removeTodo(props.idx)
+}
+
+function handleKeydown ({actions}, e) {
+  switch (e.which) {
+    case ENTER_KEY:
+      return actions.submitEdit(e.currentTarget.value)
+    case ESCAPE_KEY:
+      return actions.cancelEdit()
+  }
+}
+
+function submitEdit ({props, actions}, e) {
+  const {idx} = props
+  const text = e.currentTarget.value.trim()
+  return text
+    ? [setTodoText(idx, text), actions.cancelEdit()]
+    : actions.cancelEdit()
+}
+
+function toggleDropdown ({refs}) {
+  return refs.dropdown.toggle()
+}
+
+
+/**
  * Exports
  */
 
@@ -90,32 +126,13 @@ export default {
   render,
   reducer,
   actions: {
-    beginEdit: localAction(BEGIN_EDIT),
-    cancelEdit: localAction(CANCEL_EDIT),
-    remove: ({props}) => removeTodo(props.idx),
-    toggleCompleted: ({props}) => setCompleted(props.idx, !props.completed),
-    toggleImportant: ({props}) => setImportant(props.idx, !props.important),
-    handleKeydown: ({actions}, e) => {
-      const {submitEdit, cancelEdit} = actions
-
-      switch (e.which) {
-        case ENTER_KEY:
-          return submitEdit(e.currentTarget.value)
-        case ESCAPE_KEY:
-          return cancelEdit()
-      }
-    },
-    submitEdit: ({actions, props}, e) => {
-      const str = e.currentTarget.value.trim()
-      const {cancelEdit} = actions
-      const {idx} = props
-
-      return str
-        ? [setTodoText(idx, str), cancelEdit()]
-        : cancelEdit()
-    },
-    toggleDropdown ({refs}) {
-      return refs.dropdown.toggle()
-    }
+    beginEdit,
+    cancelEdit,
+    remove,
+    toggleCompleted,
+    toggleImportant,
+    handleKeydown,
+    submitEdit,
+    toggleDropdown
   }
 }
