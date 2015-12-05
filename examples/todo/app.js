@@ -3,10 +3,9 @@
  */
 
 import element from 'virtex-element'
-import {addTodo, removeTodo, markTodoImportant, setAllCompleted} from './actions'
-import {localAction} from 'virtex-local'
 import Todo from './components/todo'
 import Footer from './components/footer'
+import {addTodo, removeTodo, markTodoImportant, setAllCompleted} from './actions'
 
 /**
  * Constants
@@ -29,7 +28,7 @@ function initialState () {
  * Render
  */
 
-function render ({props, state, actions}) {
+function render ({props, state, local}) {
   const {url, todos} = props
   const numCompleted = todos.reduce((acc, todo) => acc + (todo.completed ? 1 : 0), 0)
   const allDone = numCompleted === todos.length
@@ -44,13 +43,13 @@ function render ({props, state, actions}) {
           class='new-todo'
           autofocus
           type='text'
-          onKeyUp={actions.setText}
-          onKeyDown={actions.maybeSubmit}
+          onKeyUp={handleKeyup(local(setText))}
+          onKeyDown={maybeSubmit(local(setText))}
           value={state.text}
           placeholder='What needs to be done?' />
       </header>
       <section id='main' class='main' style={{display: todos.length ? 'block' : 'none'}}>
-        <input class='toggle-all' type='checkbox' onChange={actions.toggleAll} checked={allDone} />
+        <input class='toggle-all' type='checkbox' onChange={toggleAll} checked={allDone} />
         <label for='toggle-all'>
           Mark all as complete
         </label>
@@ -104,24 +103,29 @@ function reducer (state, action) {
 
 const SET_TEXT = 'SET_TEXT'
 
-const setText = localAction(SET_TEXT)
-
-function handleKeyup ({actions}, e) {
-  return actions.setText(e.target.value.trim())
-}
-
-function maybeSubmit ({actions}, e) {
-  const text = e.target.value.trim()
-
-  if (text && e.which === ENTER_KEY) {
-    return [
-      actions.setText(''),
-      addTodo(text)
-    ]
+function setText (text) {
+  return {
+    type: SET_TEXT,
+    payload: text
   }
 }
 
-function toggleAll (model, e) {
+function handleKeyup (setText) {
+  return e => setText(e.target.value.trim())
+}
+
+function maybeSubmit (setText) {
+  return e => {
+    if (text && e.which === ENTER_KEY) {
+      return [
+        setText(''),
+        addTodo(text)
+      ]
+    }
+  }
+}
+
+function toggleAll (e) {
   return setAllCompleted(e.target.checked)
 }
 
@@ -132,11 +136,5 @@ function toggleAll (model, e) {
 export default {
   initialState,
   render,
-  reducer,
-  actions: {
-    setText,
-    handleKeyup,
-    maybeSubmit,
-    toggleAll
-  }
+  reducer
 }

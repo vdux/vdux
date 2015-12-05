@@ -3,9 +3,8 @@
  */
 
 import {handleOnce, unhandle} from 'redux-effects-events'
-import {localAction} from 'virtex-local'
-import {bind} from 'redux-effects'
 import element from 'virtex-element'
+import {bind} from 'redux-effects'
 
 /**
  * Actions
@@ -30,24 +29,24 @@ function initialState () {
  */
 
 function beforeUpdate (prev, next) {
-  if (!prev.state.open && next.state.open) {
-    return bindCloseHandler(next.actions)
-  } else if(prev.state.open && !next.state.open) {
-    return unbindCloseHandler(next.actions, next.state.handlerId)
+  if (!prev.props.open && next.props.open) {
+    return bindCloseHandler(next.props.close, next.local)
+  } else if(prev.props.open && !next.props.open) {
+    return unbindCloseHandler(next.local, next.state.handlerId)
   }
 }
 
-function bindCloseHandler ({close, setHandlerId}) {
+function bindCloseHandler (close, local) {
   return bind(
     handleOnce('click', close),
-    setHandlerId
+    local(setHandlerId)
   )
 }
 
-function unbindCloseHandler ({setHandlerId}, id) {
+function unbindCloseHandler (local, id) {
   return [
     unhandle('click', id),
-    setHandlerId(null)
+    local(setHandlerId)(null)
   ]
 }
 
@@ -55,8 +54,8 @@ function unbindCloseHandler ({setHandlerId}, id) {
  * Render
  */
 
-function render ({children, state}) {
-  const {open} = state
+function render ({children, props}) {
+  const {open} = props
 
   return (
     <ul class='dropdown' style={{display: open ? 'block' : 'none'}}>
@@ -71,16 +70,6 @@ function render ({children, state}) {
 
 function reducer (state, action) {
   switch (action.type) {
-    case TOGGLE:
-      return {
-        ...state,
-        open: !state.open
-      }
-    case CLOSE:
-      return {
-        ...state,
-        open: false
-      }
     case SET_HANDLER_ID:
       return {
         ...state,
@@ -92,6 +81,29 @@ function reducer (state, action) {
 }
 
 /**
+ * Local actions
+ */
+
+function toggle () {
+  return {
+    type: TOGGLE
+  }
+}
+
+function close () {
+  return {
+    type: CLOSE
+  }
+}
+
+function setHandlerId (id) {
+  return {
+    type: SET_HANDLER_ID,
+    payload: id
+  }
+}
+
+/**
  * Exports
  */
 
@@ -100,9 +112,8 @@ export default {
   beforeUpdate,
   render,
   reducer,
-  actions: {
-    toggle: localAction(TOGGLE),
-    close: localAction(CLOSE),
-    setHandlerId: localAction(SET_HANDLER_ID)
-  }
+  toggle,
+  close,
+  TOGGLE,
+  CLOSE
 }
