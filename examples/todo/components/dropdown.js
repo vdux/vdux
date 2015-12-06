@@ -106,7 +106,7 @@ function close () {
   }
 }
 
-function setHandlerId (id) {
+function setHandlerId (model, id) {
   return {
     type: SET_HANDLER_ID,
     payload: id
