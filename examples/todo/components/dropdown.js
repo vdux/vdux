@@ -29,16 +29,16 @@ function initialState () {
  */
 
 function beforeUpdate (prev, next) {
-  if (!prev.props.open && next.props.open) {
-    return bindCloseHandler(next.props.close, next.local)
-  } else if(prev.props.open && !next.props.open) {
+  if (!prev.state.open && next.state.open) {
+    return bindCloseHandler(next.local)
+  } else if(prev.state.open && !next.state.open) {
     return unbindCloseHandler(next.local, next.state.handlerId)
   }
 }
 
-function bindCloseHandler (close, local) {
+function bindCloseHandler (local) {
   return bind(
-    handleOnce('click', close),
+    handleOnce('click', local(close)),
     local(setHandlerId)
   )
 }
@@ -54,8 +54,8 @@ function unbindCloseHandler (local, id) {
  * Render
  */
 
-function render ({children, props}) {
-  const {open} = props
+function render ({children, state}) {
+  const {open} = state
 
   return (
     <ul class='dropdown' style={{display: open ? 'block' : 'none'}}>
@@ -74,6 +74,16 @@ function reducer (state, action) {
       return {
         ...state,
         handlerId: action.payload
+      }
+    case TOGGLE:
+      return {
+        ...state,
+        open: !state.open
+      }
+    case CLOSE:
+      return {
+        ...state,
+        open: false
       }
   }
 
@@ -112,8 +122,5 @@ export default {
   beforeUpdate,
   render,
   reducer,
-  toggle,
-  close,
-  TOGGLE,
-  CLOSE
+  toggle
 }

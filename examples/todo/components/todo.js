@@ -28,9 +28,9 @@ function initialState () {
  * Render
  */
 
-function render ({state, props, local}) {
+function render ({state, props, local, ref}) {
   const {text, important, completed, idx} = props
-  const {editing, dropdownOpen} = state
+  const {editing} = state
 
   return (
     <li class={{completed, important, editing}}>
@@ -38,9 +38,9 @@ function render ({state, props, local}) {
         <input class='toggle' type='checkbox' onChange={e => setCompleted(idx, !completed)} checked={completed} />
         <label style={{color: important ? 'red' : 'black'}}>
           {text}
-          <img class='options' src='css/options.png' onClick={local(Dropdown.toggle)} />
-          <Dropdown open={dropdownOpen} close={local(Dropdown.close)}>
-            <div onClick={e => toggleImportant(idx, !important)}>Important</div>
+          <img class='options' src='css/options.png' onClick={ref.to('dropdown', Dropdown.toggle)} />
+          <Dropdown ref={ref.as('dropdown')}>
+            <div onClick={e => setImportant(idx, !important)}>Important</div>
             <div onClick={local(remove)}>Remove</div>
           </Dropdown>
         </label>
@@ -69,16 +69,6 @@ function reducer (state, action) {
       return {
         ...state,
         editing: false
-      }
-    case Dropdown.TOGGLE:
-      return {
-        ...state,
-        dropdownOpen: !state.dropdownOpen
-      }
-    case Dropdown.CLOSE:
-      return {
-        ...state,
-        dropdownOpen: false
       }
   }
 }
