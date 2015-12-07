@@ -5,6 +5,7 @@
 import {removeTodo, setImportant, setCompleted, setTodoText} from '../actions'
 import combineReducers from '@micro-js/combine-reducers'
 import handleActions from '@micro-js/handle-actions'
+import createAction from '@micro-js/create-action'
 import element from 'virtex-element'
 import Dropdown from './dropdown'
 
@@ -56,11 +57,14 @@ function render ({state, props, local, ref}) {
 }
 
 /**
- * Local action types
+ * Local actions
  */
 
 const BEGIN_EDIT = 'BEGIN_EDIT'
 const CANCEL_EDIT = 'CANCEL_EDIT'
+
+const beginEdit = createAction(BEGIN_EDIT)
+const cancelEdit = createAction(CANCEL_EDIT)
 
 /**
  * Local reducer
@@ -74,20 +78,8 @@ const reducer = combineReducers({
 })
 
 /**
- * Local actions
+ * Action helpers
  */
-
-function beginEdit () {
-  return {
-    type: BEGIN_EDIT
-  }
-}
-
-function cancelEdit () {
-  return {
-    type: CANCEL_EDIT
-  }
-}
 
 function handleKeydown (cancelEdit, idx) {
   const submit = submitEdit(cancelEdit, idx)

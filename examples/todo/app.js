@@ -5,6 +5,9 @@
 import element from 'virtex-element'
 import Todo from './components/todo'
 import Footer from './components/footer'
+import createAction from '@micro-js/create-action'
+import handleActions from '@micro-js/handle-actions'
+import combineReducers from '@micro-js/combine-reducers'
 import {addTodo, removeTodo, markTodoImportant, setAllCompleted} from './actions'
 
 /**
@@ -82,53 +85,37 @@ function render ({props, state, local}) {
 }
 
 /**
- * Reducer
- */
-
-function reducer (state, action) {
-  switch (action.type) {
-    case SET_TEXT:
-    console.log('here', action)
-      return {
-        ...state,
-        text: action.payload
-      }
-  }
-
-  return state
-}
-
-/**
  * Local actions
  */
 
 const SET_TEXT = 'SET_TEXT'
+const setText = createAction(SET_TEXT)
 
-function setText (model, text) {
-  return {
-    type: SET_TEXT,
-    payload: text
+/**
+ * Reducer
+ */
+
+const reducer = combineReducers({
+  text: handleActions({
+    [SET_TEXT]: (state, text) => text
+  })
+})
+
+/**
+ * Action helpers
+ */
+
+const toggleAll = e => setAllCompleted(e.target.checked)
+const handleKeyup = setText => e => setText(e.target.value.trim())
+const maybeSubmit = setText => e => {
+  const text = e.target.value.trim()
+
+  if (text && e.which === ENTER_KEY) {
+    return [
+      setText(''),
+      addTodo(text)
+    ]
   }
-}
-
-function handleKeyup (setText) {
-  return e => setText(e.target.value.trim())
-}
-
-function maybeSubmit (setText) {
-  return e => {
-    const text = e.target.value.trim()
-    if (text && e.which === ENTER_KEY) {
-      return [
-        setText(''),
-        addTodo(text)
-      ]
-    }
-  }
-}
-
-function toggleAll (e) {
-  return setAllCompleted(e.target.checked)
 }
 
 /**

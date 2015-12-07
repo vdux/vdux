@@ -5,16 +5,9 @@
 import {handleOnce, unhandle} from 'redux-effects-events'
 import combineReducers from '@micro-js/combine-reducers'
 import handleActions from '@micro-js/handle-actions'
+import createAction from '@micro-js/create-action'
 import element from 'virtex-element'
 import {bind} from 'redux-effects'
-
-/**
- * Actions
- */
-
-const TOGGLE = 'TOGGLE_DROPDOWN'
-const CLOSE = 'CLOSE_DROPDOWN'
-const SET_HANDLER_ID = 'SET_HANDLER_ID'
 
 /**
  * initialState
@@ -53,6 +46,18 @@ function render ({children, state}) {
 }
 
 /**
+ * Local actions
+ */
+
+const TOGGLE = 'TOGGLE_DROPDOWN'
+const CLOSE = 'CLOSE_DROPDOWN'
+const SET_HANDLER_ID = 'SET_HANDLER_ID'
+
+const toggle = createAction(TOGGLE)
+const close = createAction(CLOSE)
+const setHandlerId = createAction(SET_HANDLER_ID)
+
+/**
  * Reducer
  */
 
@@ -67,27 +72,8 @@ const reducer = combineReducers({
 })
 
 /**
- * Local actions
+ * Action helpers
  */
-
-function toggle () {
-  return {
-    type: TOGGLE
-  }
-}
-
-function close () {
-  return {
-    type: CLOSE
-  }
-}
-
-function setHandlerId (model, id) {
-  return {
-    type: SET_HANDLER_ID,
-    payload: id
-  }
-}
 
 function bindCloseHandler (local) {
   return bind(
@@ -102,7 +88,6 @@ function unbindCloseHandler (local, id) {
     local(setHandlerId)(null)
   ]
 }
-
 
 /**
  * Exports
