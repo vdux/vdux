@@ -3,6 +3,8 @@
  */
 
 import {handleOnce, unhandle} from 'redux-effects-events'
+import combineReducers from '@micro-js/combine-reducers'
+import handleActions from '@micro-js/handle-actions'
 import element from 'virtex-element'
 import {bind} from 'redux-effects'
 
@@ -36,20 +38,6 @@ function beforeUpdate (prev, next) {
   }
 }
 
-function bindCloseHandler (local) {
-  return bind(
-    handleOnce('click', local(close)),
-    local(setHandlerId)
-  )
-}
-
-function unbindCloseHandler (local, id) {
-  return [
-    unhandle('click', id),
-    local(setHandlerId)(null)
-  ]
-}
-
 /**
  * Render
  */
@@ -68,27 +56,15 @@ function render ({children, state}) {
  * Reducer
  */
 
-function reducer (state, action) {
-  switch (action.type) {
-    case SET_HANDLER_ID:
-      return {
-        ...state,
-        handlerId: action.payload
-      }
-    case TOGGLE:
-      return {
-        ...state,
-        open: !state.open
-      }
-    case CLOSE:
-      return {
-        ...state,
-        open: false
-      }
-  }
-
-  return state
-}
+const reducer = combineReducers({
+  handlerId: handleActions({
+    [SET_HANDLER_ID]: (state, id) => id
+  }),
+  open: handleActions({
+    [TOGGLE]: (state) => !state,
+    [CLOSE]: () => false
+  })
+})
 
 /**
  * Local actions
@@ -112,6 +88,21 @@ function setHandlerId (model, id) {
     payload: id
   }
 }
+
+function bindCloseHandler (local) {
+  return bind(
+    handleOnce('click', local(close)),
+    local(setHandlerId)
+  )
+}
+
+function unbindCloseHandler (local, id) {
+  return [
+    unhandle('click', id),
+    local(setHandlerId)(null)
+  ]
+}
+
 
 /**
  * Exports

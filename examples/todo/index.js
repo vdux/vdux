@@ -16,9 +16,7 @@ import {initializeApp} from './actions'
 
 const store = createStore({
   todos: [],
-  0: {
-    0: {}
-  }
+  app: {}
 })
 
 /**

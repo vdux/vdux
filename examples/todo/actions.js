@@ -4,6 +4,7 @@
 
 import {bind} from 'redux-effects'
 import {bindUrl} from 'redux-effects-location'
+import createAction from '@micro-js/create-action'
 import {setItem, getItem} from 'redux-effects-localstorage'
 
 /**
@@ -21,7 +22,7 @@ const URL_DID_UPDATE = 'URL_DID_UPDATE'
 const HYDRATE_STATE = 'HYDRATE_STATE'
 
 /**
- * Vars
+ * Constants
  */
 
 const localStorageKey = 'todos-vdux'
@@ -37,81 +38,18 @@ function initializeApp () {
   ]
 }
 
-function urlDidUpdate (url) {
-  return {
-    type: URL_DID_UPDATE,
-    payload: {
-      url
-    }
-  }
-}
-
 function initializeRouter () {
   return bindUrl(urlDidUpdate)
 }
 
-function addTodo (text) {
-  return {
-    type: TODO_ADD,
-    payload: {
-      text
-    }
-  }
-}
-
-function removeTodo (idx) {
-  return {
-    type: TODO_REMOVE,
-    payload: {
-      idx
-    }
-  }
-}
-
-function setTodoText (idx, text) {
-  return {
-    type: TODO_SET_TEXT,
-    payload: {
-      idx,
-      text
-    }
-  }
-}
-
-function setImportant (idx, important) {
-  return {
-    type: TODO_SET_IMPORTANT,
-    payload: {
-      idx,
-      important
-    }
-  }
-}
-
-function setCompleted (idx, completed) {
-  return {
-    type: TODO_SET_COMPLETED,
-    payload: {
-      idx,
-      completed
-    }
-  }
-}
-
-function setAllCompleted (completed) {
-  return {
-    type: SET_ALL_COMPLETED,
-    payload: {
-      completed
-    }
-  }
-}
-
-function clearCompleted () {
-  return {
-    type: CLEAR_COMPLETED
-  }
-}
+const urlDidUpdate = createAction(URL_DID_UPDATE, url => ({url}))
+const addTodo = createAction(TODO_ADD, text => ({text}))
+const removeTodo = createAction(TODO_REMOVE, idx => ({idx}))
+const setTodoText = createAction(TODO_SET_TEXT, (idx, text) => ({idx, text}))
+const setImportant = createAction(TODO_SET_IMPORTANT, (idx, important) => ({idx, important}))
+const setCompleted = createAction(TODO_SET_COMPLETED, (idx, completed) => ({idx, completed}))
+const setAllCompleted = createAction(SET_ALL_COMPLETED, completed => ({completed}))
+const clearCompleted = createAction(CLEAR_COMPLETED)
 
 function persistTodos (todos) {
   return setItem(localStorageKey, JSON.stringify(todos))
@@ -121,13 +59,7 @@ function hydrateTodos () {
   return bind(getItem(localStorageKey), todosStr => todosStr && hydrateState({todos: JSON.parse(todosStr)}))
 }
 
-function hydrateState (state) {
-  return {
-    type: HYDRATE_STATE,
-    payload: state
-  }
-}
-
+const hydrateState = createAction(HYDRATE_STATE)
 
 /**
  * Exports

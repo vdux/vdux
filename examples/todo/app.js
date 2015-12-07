@@ -88,6 +88,7 @@ function render ({props, state, local}) {
 function reducer (state, action) {
   switch (action.type) {
     case SET_TEXT:
+    console.log('here', action)
       return {
         ...state,
         text: action.payload
@@ -103,7 +104,7 @@ function reducer (state, action) {
 
 const SET_TEXT = 'SET_TEXT'
 
-function setText (text) {
+function setText (model, text) {
   return {
     type: SET_TEXT,
     payload: text
@@ -116,6 +117,7 @@ function handleKeyup (setText) {
 
 function maybeSubmit (setText) {
   return e => {
+    const text = e.target.value.trim()
     if (text && e.which === ENTER_KEY) {
       return [
         setText(''),

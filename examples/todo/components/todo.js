@@ -2,10 +2,11 @@
  * Imports
  */
 
-import element from 'virtex-element'
-import {localAction} from 'virtex-local'
-import Dropdown from './dropdown'
 import {removeTodo, setImportant, setCompleted, setTodoText} from '../actions'
+import combineReducers from '@micro-js/combine-reducers'
+import handleActions from '@micro-js/handle-actions'
+import element from 'virtex-element'
+import Dropdown from './dropdown'
 
 /**
  * Key constants
@@ -41,7 +42,7 @@ function render ({state, props, local, ref}) {
           <img class='options' src='css/options.png' onClick={ref.to('dropdown', Dropdown.toggle)} />
           <Dropdown ref={ref.as('dropdown')}>
             <div onClick={e => setImportant(idx, !important)}>Important</div>
-            <div onClick={local(remove)}>Remove</div>
+            <div onClick={e => removeTodo(idx)}>Remove</div>
           </Dropdown>
         </label>
       </div>
@@ -55,45 +56,37 @@ function render ({state, props, local, ref}) {
 }
 
 /**
- * Local reducer
- */
-
-function reducer (state, action) {
-  switch (action.type) {
-    case BEGIN_EDIT:
-      return {
-        ...state,
-        editing: true
-      }
-    case CANCEL_EDIT:
-      return {
-        ...state,
-        editing: false
-      }
-  }
-}
-
-/**
- * Local actions
+ * Local action types
  */
 
 const BEGIN_EDIT = 'BEGIN_EDIT'
 const CANCEL_EDIT = 'CANCEL_EDIT'
 
+/**
+ * Local reducer
+ */
+
+const reducer = combineReducers({
+  editing: handleActions({
+    [BEGIN_EDIT]: () => true,
+    [CANCEL_EDIT]: () => false
+  })
+})
+
+/**
+ * Local actions
+ */
+
 function beginEdit () {
   return {
-    type: 'BEGIN_EDIT'
+    type: BEGIN_EDIT
   }
 }
 
 function cancelEdit () {
   return {
-    type: 'CANCEL_EDIT'
+    type: CANCEL_EDIT
   }
-}
-
-function remove ({props}) {
-  return removeTodo(props.idx)
 }
 
 function handleKeydown (cancelEdit, idx) {

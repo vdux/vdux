@@ -20,7 +20,7 @@ import component from 'virtex-component'
  */
 
 const middleware = [
-  local,
+  local('app'),
   component,
   dom(document),
   multi,
