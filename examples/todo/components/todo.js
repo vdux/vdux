@@ -2,19 +2,13 @@
  * Imports
  */
 
-import {removeTodo, setImportant, setCompleted, setTodoText} from '../actions'
 import combineReducers from '@micro-js/combine-reducers'
 import handleActions from '@micro-js/handle-actions'
 import createAction from '@micro-js/create-action'
+import curryOnce from '@micro-js/curry-once'
+import * as actions from '../actions'
 import element from 'virtex-element'
 import Dropdown from './dropdown'
-
-/**
- * Key constants
- */
-
-const ENTER_KEY = 13
-const ESCAPE_KEY = 27
 
 /**
  * Initial state
@@ -32,26 +26,32 @@ function initialState () {
 
 function render ({state, props, local, ref}) {
   const {text, important, completed, idx} = props
-  const {editing} = state
+  const {editing, editText} = state
+  const edit = local(beginEdit, text)
+  const cancel = local(cancelEdit)
+  const submit = editText
+    ? [setTodoText(idx, editText), cancel]
+    : removeTodo(idx)
 
   return (
     <li class={{completed, important, editing}}>
-      <div class='view' onDblClick={local(beginEdit)}>
-        <input class='toggle' type='checkbox' onChange={e => setCompleted(idx, !completed)} checked={completed} />
+      <div class='view' onDblClick={edit}>
+        <input class='toggle' type='checkbox' onChange={setCompleted(idx, !completed)} checked={completed} />
         <label style={{color: important ? 'red' : 'black'}}>
           {text}
           <img class='options' src='css/options.png' onClick={ref.to('dropdown', Dropdown.toggle)} />
           <Dropdown ref={ref.as('dropdown')}>
-            <div onClick={e => setImportant(idx, !important)}>Important</div>
-            <div onClick={e => removeTodo(idx)}>Remove</div>
+            <div onClick={setImportant(idx, !important)}>Important</div>
+            <div onClick={removeTodo(idx)}>Remove</div>
           </Dropdown>
         </label>
       </div>
       <input class='edit'
         focused={editing}
-        value={text}
-        onBlur={submitEdit(local(cancelEdit), idx)}
-        onKeyDown={handleKeydown(local(cancelEdit), idx)} />
+        value={editText}
+        onBlur={editing && submit}
+        onInput={local(setEditText)}
+        onKeyDown={{enter: submit, esc: cancel}} />
     </li>
   )
 }
@@ -62,9 +62,11 @@ function render ({state, props, local, ref}) {
 
 const BEGIN_EDIT = 'BEGIN_EDIT'
 const CANCEL_EDIT = 'CANCEL_EDIT'
+const SET_EDIT_TEXT = 'SET_EDIT_TEXT'
 
 const beginEdit = createAction(BEGIN_EDIT)
 const cancelEdit = createAction(CANCEL_EDIT)
+const setEditText = createAction(SET_EDIT_TEXT, e => e.currentTarget.value.trim())
 
 /**
  * Local reducer
@@ -74,34 +76,21 @@ const reducer = combineReducers({
   editing: handleActions({
     [BEGIN_EDIT]: () => true,
     [CANCEL_EDIT]: () => false
+  }),
+  editText: handleActions({
+    [BEGIN_EDIT]: (state, text) => text,
+    [SET_EDIT_TEXT]: (state, text) => text
   })
 })
 
 /**
- * Action helpers
+ * Curry global actions
  */
 
-function handleKeydown (cancelEdit, idx) {
-  const submit = submitEdit(cancelEdit, idx)
-
-  return e => {
-    switch (e.which) {
-      case ENTER_KEY:
-        return submit(e)
-      case ESCAPE_KEY:
-        return cancelEdit()
-    }
-  }
-}
-
-function submitEdit (cancelEdit, idx) {
-  return e => {
-    const text = e.currentTarget.value.trim()
-    return text
-      ? [setTodoText(idx, text), cancelEdit()]
-      : cancelEdit()
-  }
-}
+const removeTodo = curryOnce(actions.removeTodo)
+const setImportant = curryOnce(actions.setImportant)
+const setCompleted = curryOnce(actions.setCompleted)
+const setTodoText = curryOnce(actions.setTodoText)
 
 /**
  * Exports

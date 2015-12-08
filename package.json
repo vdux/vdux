@@ -12,6 +12,7 @@
   "dependencies": {
     "@micro-js/combine-reducers": "^1.0.3",
     "@micro-js/create-action": "^1.0.0",
+    "@micro-js/curry-once": "^1.2.0",
     "@micro-js/handle-actions": "^1.0.3",
     "@micro-js/set-prop": "^0.1.4",
     "delegant": "^0.1.3",

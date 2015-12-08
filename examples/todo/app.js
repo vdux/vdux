@@ -2,19 +2,13 @@
  * Imports
  */
 
+import {addTodo, removeTodo, markTodoImportant, setAllCompleted} from './actions'
+import combineReducers from '@micro-js/combine-reducers'
+import handleActions from '@micro-js/handle-actions'
+import createAction from '@micro-js/create-action'
+import Footer from './components/footer'
 import element from 'virtex-element'
 import Todo from './components/todo'
-import Footer from './components/footer'
-import createAction from '@micro-js/create-action'
-import handleActions from '@micro-js/handle-actions'
-import combineReducers from '@micro-js/combine-reducers'
-import {addTodo, removeTodo, markTodoImportant, setAllCompleted} from './actions'
-
-/**
- * Constants
- */
-
-const ENTER_KEY = 13
 
 /**
  * initialState
@@ -47,7 +41,7 @@ function render ({props, state, local}) {
           autofocus
           type='text'
           onKeyUp={handleKeyup(local(setText))}
-          onKeyDown={maybeSubmit(local(setText))}
+          onKeyDown={{enter: maybeSubmit(local(setText))}}
           value={state.text}
           placeholder='What needs to be done?' />
       </header>
@@ -106,11 +100,14 @@ const reducer = combineReducers({
  */
 
 const toggleAll = e => setAllCompleted(e.target.checked)
-const handleKeyup = setText => e => setText(e.target.value.trim())
+const handleKeyup = setText => e => {
+  return setText(e.target.value.trim())
+}
+
 const maybeSubmit = setText => e => {
   const text = e.target.value.trim()
 
-  if (text && e.which === ENTER_KEY) {
+  if (text) {
     return [
       setText(''),
       addTodo(text)
