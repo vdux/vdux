@@ -2,11 +2,12 @@
  * Imports
  */
 
-import {addTodo, removeTodo, markTodoImportant, setAllCompleted} from './actions'
 import combineReducers from '@micro-js/combine-reducers'
 import handleActions from '@micro-js/handle-actions'
 import createAction from '@micro-js/create-action'
+import curryOnce from '@micro-js/curry-once'
 import Footer from './components/footer'
+import * as actions from './actions'
 import element from 'virtex-element'
 import Todo from './components/todo'
 
@@ -27,10 +28,12 @@ function initialState () {
 
 function render ({props, state, local}) {
   const {url, todos} = props
+  const {text} = state
   const numCompleted = todos.reduce((acc, todo) => acc + (todo.completed ? 1 : 0), 0)
   const allDone = numCompleted === todos.length
   const itemsLeft = todos.length - numCompleted
   const activeFilter = url.slice(1).toLowerCase() || 'all'
+  const submit = [addTodo(text), local(clearText)]
 
   return (
     <section class='todoapp'>
@@ -40,13 +43,13 @@ function render ({props, state, local}) {
           class='new-todo'
           autofocus
           type='text'
-          onKeyUp={handleKeyup(local(setText))}
-          onKeyDown={{enter: maybeSubmit(local(setText))}}
+          onInput={local(setText)}
+          onKeyDown={{enter: text && submit}}
           value={state.text}
           placeholder='What needs to be done?' />
       </header>
       <section id='main' class='main' style={{display: todos.length ? 'block' : 'none'}}>
-        <input class='toggle-all' type='checkbox' onChange={toggleAll} checked={allDone} />
+        <input class='toggle-all' type='checkbox' onChange={setAllCompleted(!allDone)} checked={allDone} />
         <label for='toggle-all'>
           Mark all as complete
         </label>
@@ -83,7 +86,9 @@ function render ({props, state, local}) {
  */
 
 const SET_TEXT = 'SET_TEXT'
-const setText = createAction(SET_TEXT)
+const CLEAR_TEXT = 'CLEAR_TEXT'
+const setText = createAction(SET_TEXT, e => e.target.value.trim())
+const clearText = createAction(CLEAR_TEXT)
 
 /**
  * Reducer
@@ -91,29 +96,17 @@ const setText = createAction(SET_TEXT)
 
 const reducer = combineReducers({
   text: handleActions({
+    [CLEAR_TEXT]: () => '',
     [SET_TEXT]: (state, text) => text
   })
 })
 
 /**
- * Action helpers
+ * Curried global actions
  */
 
-const toggleAll = e => setAllCompleted(e.target.checked)
-const handleKeyup = setText => e => {
-  return setText(e.target.value.trim())
-}
-
-const maybeSubmit = setText => e => {
-  const text = e.target.value.trim()
-
-  if (text) {
-    return [
-      setText(''),
-      addTodo(text)
-    ]
-  }
-}
+const addTodo = curryOnce(actions.addTodo)
+const setAllCompleted = curryOnce(actions.setAllCompleted)
 
 /**
  * Exports

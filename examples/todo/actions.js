@@ -66,7 +66,11 @@ const hydrateState = createAction(HYDRATE_STATE)
  */
 
 export {
-  // Action creators
+  addTodo,
+  removeTodo,
+  setTodoText,
+  setImportant,
+  setCompleted,
   addTodo,
   removeTodo,
   setTodoText,
