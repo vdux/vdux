@@ -49,13 +49,9 @@ function render ({children, state}) {
  * Local actions
  */
 
-const TOGGLE = 'TOGGLE_DROPDOWN'
-const CLOSE = 'CLOSE_DROPDOWN'
-const SET_HANDLER_ID = 'SET_HANDLER_ID'
-
-const toggle = createAction(TOGGLE)
-const close = createAction(CLOSE)
-const setHandlerId = createAction(SET_HANDLER_ID)
+const toggle = createAction('TOGGLE')
+const close = createAction('CLOSE')
+const setHandlerId = createAction('SET_HANDLER_ID')
 
 /**
  * Reducer
@@ -63,11 +59,11 @@ const setHandlerId = createAction(SET_HANDLER_ID)
 
 const reducer = combineReducers({
   handlerId: handleActions({
-    [SET_HANDLER_ID]: (state, id) => id
+    [setHandlerId]: (state, id) => id
   }),
   open: handleActions({
-    [TOGGLE]: (state) => !state,
-    [CLOSE]: () => false
+    [toggle]: (state) => !state,
+    [close]: () => false
   })
 })
 

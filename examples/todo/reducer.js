@@ -8,38 +8,37 @@ import combineReducers from '@micro-js/combine-reducers'
 import handleActions from '@micro-js/handle-actions'
 import ephemeral from 'redux-ephemeral'
 import {
-  TODO_ADD,
-  TODO_REMOVE,
-  TODO_SET_TEXT,
-  TODO_SET_IMPORTANT,
-  TODO_SET_COMPLETED,
-  SET_ALL_COMPLETED,
-  CLEAR_COMPLETED,
-  URL_DID_UPDATE,
-  HYDRATE_STATE
+  addTodo, removeTodo, setTodoText,
+  setImportant, setCompleted, setAllCompleted,
+  clearCompleted, urlDidUpdate, hydrateState
 } from './actions'
-
 
 /**
  * Reducers
  */
 
 const hydrateReducer = handleActions({
-  [HYDRATE_STATE]: (state, newState) => newState
+  [hydrateState]: (state, newState) => newState
 })
 
+// Note that these are action creator functions being
+// used as keys. They have an overriden .toString()
+// property that makes this work.
+//
+// Read more here:
+// https://github.com/micro-js/create-action
 const todoReducer = handleActions({
-  [TODO_SET_TEXT]: (todos, {idx, text}) => setProp([idx, 'text'], todos, text),
-  [TODO_SET_IMPORTANT]: (todos, {idx, important}) => setProp([idx, 'important'], todos, important),
-  [TODO_SET_COMPLETED]: (todos, {idx, completed}) => setProp([idx, 'completed'], todos, completed),
-  [TODO_ADD]: (todos, {text}) => todos.concat({text, important: false, completed: false}),
-  [TODO_REMOVE]: (todos, {idx}) => todos.filter((todo, i) => idx !== i),
-  [SET_ALL_COMPLETED]: (todos, {completed}) => todos.map(todo => ({...todo, completed})),
-  [CLEAR_COMPLETED]: (todos) => todos.filter(todo => !todo.completed)
+  [setTodoText]: (todos, {idx, text}) => setProp([idx, 'text'], todos, text),
+  [setImportant]: (todos, {idx, important}) => setProp([idx, 'important'], todos, important),
+  [setCompleted]: (todos, {idx, completed}) => setProp([idx, 'completed'], todos, completed),
+  [addTodo]: (todos, {text}) => todos.concat({text, important: false, completed: false}),
+  [removeTodo]: (todos, {idx}) => todos.filter((todo, i) => idx !== i),
+  [setAllCompleted]: (todos, {completed}) => todos.map(todo => ({...todo, completed})),
+  [clearCompleted]: (todos) => todos.filter(todo => !todo.completed)
 })
 
 const urlReducer = handleActions({
-  [URL_DID_UPDATE]: (oldUrl, {url}) => url
+  [urlDidUpdate]: (oldUrl, {url}) => url
 }, '/')
 
 /**

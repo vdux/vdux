@@ -2,12 +2,11 @@
  * Imports
  */
 
+import {addTodo, setAllCompleted} from './curriedActions'
 import combineReducers from '@micro-js/combine-reducers'
 import handleActions from '@micro-js/handle-actions'
 import createAction from '@micro-js/create-action'
-import curryOnce from '@micro-js/curry-once'
 import Footer from './components/footer'
-import * as actions from './actions'
 import element from 'virtex-element'
 import Todo from './components/todo'
 
@@ -85,10 +84,8 @@ function render ({props, state, local}) {
  * Local actions
  */
 
-const SET_TEXT = 'SET_TEXT'
-const CLEAR_TEXT = 'CLEAR_TEXT'
-const setText = createAction(SET_TEXT, e => e.target.value.trim())
-const clearText = createAction(CLEAR_TEXT)
+const setText = createAction('SET_TEXT', e => e.target.value.trim())
+const clearText = createAction('CLEAR_TEXT')
 
 /**
  * Reducer
@@ -96,17 +93,10 @@ const clearText = createAction(CLEAR_TEXT)
 
 const reducer = combineReducers({
   text: handleActions({
-    [CLEAR_TEXT]: () => '',
-    [SET_TEXT]: (state, text) => text
+    [clearText]: () => '',
+    [setText]: (state, text) => text
   })
 })
-
-/**
- * Curried global actions
- */
-
-const addTodo = curryOnce(actions.addTodo)
-const setAllCompleted = curryOnce(actions.setAllCompleted)
 
 /**
  * Exports

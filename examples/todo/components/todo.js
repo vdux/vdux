@@ -2,11 +2,10 @@
  * Imports
  */
 
+import {removeTodo, setImportant, setCompleted, setTodoText} from '../curriedActions'
 import combineReducers from '@micro-js/combine-reducers'
 import handleActions from '@micro-js/handle-actions'
 import createAction from '@micro-js/create-action'
-import curryOnce from '@micro-js/curry-once'
-import * as actions from '../actions'
 import element from 'virtex-element'
 import Dropdown from './dropdown'
 
@@ -60,13 +59,9 @@ function render ({state, props, local, ref}) {
  * Local actions
  */
 
-const BEGIN_EDIT = 'BEGIN_EDIT'
-const CANCEL_EDIT = 'CANCEL_EDIT'
-const SET_EDIT_TEXT = 'SET_EDIT_TEXT'
-
-const beginEdit = createAction(BEGIN_EDIT)
-const cancelEdit = createAction(CANCEL_EDIT)
-const setEditText = createAction(SET_EDIT_TEXT, e => e.currentTarget.value.trim())
+const beginEdit = createAction('BEGIN_EDIT')
+const cancelEdit = createAction('CANCEL_EDIT')
+const setEditText = createAction('SET_EDIT_TEXT', e => e.currentTarget.value.trim())
 
 /**
  * Local reducer
@@ -74,23 +69,14 @@ const setEditText = createAction(SET_EDIT_TEXT, e => e.currentTarget.value.trim(
 
 const reducer = combineReducers({
   editing: handleActions({
-    [BEGIN_EDIT]: () => true,
-    [CANCEL_EDIT]: () => false
+    [beginEdit]: () => true,
+    [cancelEdit]: () => false
   }),
   editText: handleActions({
-    [BEGIN_EDIT]: (state, text) => text,
-    [SET_EDIT_TEXT]: (state, text) => text
+    [beginEdit]: (state, text) => text,
+    [setEditText]: (state, text) => text
   })
 })
-
-/**
- * Curry global actions
- */
-
-const removeTodo = curryOnce(actions.removeTodo)
-const setImportant = curryOnce(actions.setImportant)
-const setCompleted = curryOnce(actions.setCompleted)
-const setTodoText = curryOnce(actions.setTodoText)
 
 /**
  * Exports
