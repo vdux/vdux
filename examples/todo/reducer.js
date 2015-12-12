@@ -21,7 +21,7 @@ const hydrateReducer = handleActions({
   [hydrateState]: (state, newState) => newState
 })
 
-const todoReducer = combineReducers({
+const todoReducer = handleActions({
   [setTodoText]: (todo, {text}) => ({...todo, text}),
   [setImportant]: (todo, {important}) => ({...todo, important}),
   [setCompleted]: (todo, {completed}) => ({...todo, completed})
