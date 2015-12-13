@@ -2,16 +2,16 @@
  * Imports
  */
 
-import element from 'virtex-element'
 import {requestPosts, selectReddit} from './actions'
-import Posts from './components/posts'
 import Picker from './components/picker'
+import Posts from './components/posts'
+import element from 'virtex-element'
 
 /**
  * beforeMount
  */
 
-function beforeMount (props) {
+function beforeMount ({props}) {
   return requestPosts(props.reddit)
 }
 
@@ -19,9 +19,9 @@ function beforeMount (props) {
  * beforeUpdate
  */
 
-function beforeUpdate (prevProps, nextProps) {
-  if (prevProps.reddit !== nextProps.reddit) {
-    return requestPosts(nextProps.reddit)
+function beforeUpdate (prev, next) {
+  if (prev.props.reddit !== next.props.reddit) {
+    return requestPosts(next.props.reddit)
   }
 }
 
@@ -29,7 +29,7 @@ function beforeUpdate (prevProps, nextProps) {
  * Render
  */
 
-function render (props) {
+function render ({props}) {
   const {reddit, posts, loading, lastUpdated} = props
   const lastUpdatedStr = new Date(lastUpdated).toLocaleTimeString()
 

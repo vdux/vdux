@@ -62,7 +62,7 @@ const reducer = combineReducers({
     [setHandlerId]: (state, id) => id
   }),
   open: handleActions({
-    [toggle]: (state) => !state,
+    [toggle]: state => !state,
     [close]: () => false
   })
 })

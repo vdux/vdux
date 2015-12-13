@@ -2,14 +2,16 @@
  * Imports
  */
 
-import element from 'vdom-element'
 import MainLayout from '../layouts/main'
+import element from 'virtex-element'
 
 /**
  * Render
  */
 
-function render ({url}) {
+function render ({props}) {
+  const {url} = props
+
   return (
     <MainLayout nav={<Nav />}>
       <div>

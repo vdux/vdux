@@ -3,7 +3,7 @@
  */
 
 import {createStore, applyMiddleware} from 'redux'
-import reducer from './reducer'
+import reducer from './reducers'
 import effects from 'redux-effects'
 import events from 'redux-effects-events'
 import location from 'redux-effects-location'

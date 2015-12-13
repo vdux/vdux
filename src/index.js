@@ -3,18 +3,20 @@
  */
 
 import delegant from 'delegant'
+import virtex from 'virtex'
 
 /**
  * vdux
  */
 
-function vdux (store, {create, update}, app, node) {
+function vdux (store, app, node) {
+  const {subscribe, dispatch, getState} = store
+
   /**
-   * Create the Virtual DOM <-> Redux cycle
+   * Initialize virtex
    */
 
-  const unsubscribe = store.subscribe(sync)
-  const undelegate = delegant(node, action => action && store.dispatch(action))
+  const {create, update} = virtex(dispatch)
 
   /**
    * Render the VDOM tree
@@ -23,6 +25,13 @@ function vdux (store, {create, update}, app, node) {
   let tree = render()
   let rootNode = create(tree)
   node.appendChild(rootNode)
+
+  /**
+   * Create the Virtual DOM <-> Redux cycle
+   */
+
+  const unsubscribe = subscribe(sync)
+  const undelegate = delegant(node, action => action && dispatch(action))
 
   /**
    * Return an unbind function
@@ -38,7 +47,7 @@ function vdux (store, {create, update}, app, node) {
    */
 
   function render () {
-    return app(store.getState())
+    return app(getState())
   }
 
   /**
@@ -46,17 +55,27 @@ function vdux (store, {create, update}, app, node) {
    */
 
   let pending = false
+
   function sync () {
-    // Ensure we don't get re-entrant/duplicate renders
+    // Prevent re-entrant renders
     if (pending) return
     pending = true
 
-    setTimeout(() => {
-      pending = false
-      const newTree = render()
-      update(tree, newTree, rootNode)
-      tree = newTree
-    })
+    setTimeout(syncNow)
+  }
+
+  function syncNow () {
+    pending = false
+
+    const newTree = render()
+    const newRootNode = update(tree, newTree, rootNode)
+
+    if (newRootNode !== rootNode) {
+      node.replaceChild(newRootNode, rootNode)
+      rootNode = newRootNode
+    }
+
+    tree = newTree
   }
 }
 

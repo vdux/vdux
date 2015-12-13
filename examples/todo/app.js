@@ -2,7 +2,7 @@
  * Imports
  */
 
-import {addTodo, setAllCompleted} from './curriedActions'
+import {addTodo, setAllCompleted} from './actions/curried'
 import combineReducers from '@micro-js/combine-reducers'
 import handleActions from '@micro-js/handle-actions'
 import createAction from '@micro-js/create-action'

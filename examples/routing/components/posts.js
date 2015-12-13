@@ -2,8 +2,8 @@
  * Imports
  */
 
-import element from 'vdom-element'
 import {fetchPosts} from '../actions'
+import element from 'virtex-element'
 
 /**
  * Before mount
@@ -17,7 +17,9 @@ function beforeMount () {
  * Render
  */
 
-function render ({posts = []}) {
+function render ({props}) {
+  const {posts = []} = props
+
   return (
     <div>
       {

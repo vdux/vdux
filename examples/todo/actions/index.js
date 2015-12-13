@@ -28,8 +28,8 @@ function initializeRouter () {
   return bindUrl(urlDidUpdate)
 }
 
-const urlDidUpdate = createAction('URL_DID_UPDATE', url => ({url}))
-const addTodo = createAction('TODO_ADD', text => ({text}))
+const urlDidUpdate = createAction('URL_DID_UPDATE')
+const addTodo = createAction('TODO_ADD', text => ({text, completed: false, important: false}))
 const removeTodo = createAction('TODO_REMOVE', idx => ({idx}))
 const setTodoText = createAction('TODO_SET_TEXT', (idx, text) => ({idx, text}))
 const setImportant = createAction('TODO_SET_IMPORTANT', (idx, important) => ({idx, important}))
@@ -42,7 +42,10 @@ function persistTodos (todos) {
 }
 
 function hydrateTodos () {
-  return bind(getItem(localStorageKey), todosStr => todosStr && hydrateState({todos: JSON.parse(todosStr)}))
+  return bind(
+    getItem(localStorageKey),
+    todosStr => todosStr && hydrateState({todos: JSON.parse(todosStr)})
+  )
 }
 
 const hydrateState = createAction('HYDRATE_STATE')

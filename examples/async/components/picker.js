@@ -8,7 +8,9 @@ import element from 'virtex-element'
  * Render
  */
 
-function render ({value, onChange, options}) {
+function render ({props}) {
+  const {value, onChange, options} = props
+
   return (
     <span>
       <h1>{value}</h1>

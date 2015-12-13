@@ -3,7 +3,7 @@
  */
 
 import curryAll from '@micro-js/curry-all'
-import * as actions from './actions'
+import * as actions from '.'
 
 /**
  * Curried actions
