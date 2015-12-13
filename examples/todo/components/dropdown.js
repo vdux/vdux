@@ -2,22 +2,12 @@
  * Imports
  */
 
-import localize, {localAction} from 'vdux-local'
 import {handleOnce, unhandle} from 'redux-effects-events'
+import combineReducers from '@micro-js/combine-reducers'
+import handleActions from '@micro-js/handle-actions'
+import createAction from '@micro-js/create-action'
+import element from 'virtex-element'
 import {bind} from 'redux-effects'
-import element from 'vdom-element'
-
-/**
- * Actions
- */
-
-const TOGGLE = 'TOGGLE_DROPDOWN'
-const CLOSE = 'CLOSE_DROPDOWN'
-const SET_HANDLER_ID = 'SET_HANDLER_ID'
-
-const toggle = localAction(TOGGLE)
-const close = localAction(CLOSE)
-const setHandlerId = localAction(SET_HANDLER_ID)
 
 /**
  * initialState
@@ -33,29 +23,12 @@ function initialState () {
  * beforeUpdate
  */
 
-function beforeUpdate (prevProps, nextProps) {
-  const prevState = prevProps.state
-  const nextState = nextProps.state
-
-  if (!prevState.open && nextState.open) {
-    return bindCloseHandler(nextProps.key)
-  } else if(prevState.open && !nextState.open) {
-    return unbindCloseHandler(nextProps.key, nextState.handlerId)
+function beforeUpdate (prev, next) {
+  if (!prev.state.open && next.state.open) {
+    return bindCloseHandler(next.local)
+  } else if(prev.state.open && !next.state.open) {
+    return unbindCloseHandler(next.local, next.state.handlerId)
   }
-}
-
-function bindCloseHandler (key) {
-  return bind(
-    handleOnce('click', () => close(key)),
-    id => setHandlerId(key, id)
-  )
-}
-
-function unbindCloseHandler (key, id) {
-  return [
-    unhandle('click', id),
-    setHandlerId(key, null)
-  ]
 }
 
 /**
@@ -73,39 +46,53 @@ function render ({children, state}) {
 }
 
 /**
+ * Local actions
+ */
+
+const toggle = createAction('TOGGLE')
+const close = createAction('CLOSE')
+const setHandlerId = createAction('SET_HANDLER_ID')
+
+/**
  * Reducer
  */
 
-function reducer (state, action) {
-  switch (action.type) {
-    case TOGGLE:
-      return {
-        ...state,
-        open: !state.open
-      }
-    case CLOSE:
-      return {
-        ...state,
-        open: false
-      }
-    case SET_HANDLER_ID:
-      return {
-        ...state,
-        handlerId: action.payload
-      }
-  }
+const reducer = combineReducers({
+  handlerId: handleActions({
+    [setHandlerId]: (state, id) => id
+  }),
+  open: handleActions({
+    [toggle]: state => !state,
+    [close]: () => false
+  })
+})
 
-  return state
+/**
+ * Action helpers
+ */
+
+function bindCloseHandler (local) {
+  return bind(
+    handleOnce('click', local(close)),
+    local(setHandlerId)
+  )
+}
+
+function unbindCloseHandler (local, id) {
+  return [
+    unhandle('click', id),
+    local(setHandlerId)(null)
+  ]
 }
 
 /**
  * Exports
  */
 
-export default localize({
+export default {
   initialState,
   beforeUpdate,
   render,
   reducer,
   toggle
-})
+}

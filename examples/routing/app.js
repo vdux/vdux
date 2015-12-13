@@ -2,8 +2,8 @@
  * Imports
  */
 
-import element from 'vdom-element'
 import {initializeApp} from './actions'
+import element from 'virtex-element'
 import router from './router'
 
 /**
@@ -18,7 +18,7 @@ function beforeMount () {
  * Render
  */
 
-function render (props) {
+function render ({props}) {
   return router(props.url || '/', props)
 }
 

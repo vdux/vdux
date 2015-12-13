@@ -2,12 +2,11 @@
  * Imports
  */
 
+import {handleOnce} from 'redux-effects-events'
+import configureStore from './store'
+import element from 'virtex-element'
 import vdux from '../../src'
 import App from './app'
-import configureStore from './store'
-import {listen} from 'virtual-component'
-import {handleOnce} from 'redux-effects-events'
-import element from 'vdom-element'
 
 /**
  * Setup store
@@ -20,6 +19,9 @@ const store = configureStore({})
  */
 
 store.dispatch(handleOnce('domready', () => {
-  listen(store.dispatch)
-  vdux(store, state => <App {...state} />, document.body)
+  vdux(
+    store,
+    state => <App {...state} />,
+    document.body
+  )
 }))

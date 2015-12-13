@@ -2,11 +2,11 @@
  * Imports
  */
 
-import enroute from 'enroute'
-import element from 'vdom-element'
-import Home from './components/pages/home'
-import Posts from './components/pages/posts'
 import NotFound from './components/pages/notFound'
+import Posts from './components/pages/posts'
+import Home from './components/pages/home'
+import element from 'virtex-element'
+import enroute from 'enroute'
 
 /**
  * Routes

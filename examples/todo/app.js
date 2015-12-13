@@ -2,24 +2,13 @@
  * Imports
  */
 
-import element from 'vdom-element'
-import localize, {localAction} from 'vdux-local'
-import {addTodo, removeTodo, markTodoImportant, setAllCompleted} from './actions'
-import Todo from './components/todo'
+import {addTodo, setAllCompleted} from './actions/curried'
+import combineReducers from '@micro-js/combine-reducers'
+import handleActions from '@micro-js/handle-actions'
+import createAction from '@micro-js/create-action'
 import Footer from './components/footer'
-
-/**
- * Constants
- */
-
-const ENTER_KEY = 13
-
-/**
- * Actions
- */
-
-const SET_TEXT = 'SET_TEXT'
-const setText = localAction(SET_TEXT)
+import element from 'virtex-element'
+import Todo from './components/todo'
 
 /**
  * initialState
@@ -36,11 +25,14 @@ function initialState () {
  * Render
  */
 
-function render ({key, url, todos, state}, childState) {
+function render ({props, state, local}) {
+  const {url, todos} = props
+  const {text} = state
   const numCompleted = todos.reduce((acc, todo) => acc + (todo.completed ? 1 : 0), 0)
   const allDone = numCompleted === todos.length
   const itemsLeft = todos.length - numCompleted
   const activeFilter = url.slice(1).toLowerCase() || 'all'
+  const submit = [addTodo(text), local(clearText)]
 
   return (
     <section class='todoapp'>
@@ -50,19 +42,20 @@ function render ({key, url, todos, state}, childState) {
           class='new-todo'
           autofocus
           type='text'
-          ev-keyup={handleKeyup}
+          onInput={local(setText)}
+          onKeyDown={{enter: text && submit}}
           value={state.text}
           placeholder='What needs to be done?' />
       </header>
       <section id='main' class='main' style={{display: todos.length ? 'block' : 'none'}}>
-        <input class='toggle-all' type='checkbox' ev-change={e => setAllCompleted(e.target.checked)} checked={allDone} />
+        <input class='toggle-all' type='checkbox' onChange={setAllCompleted(!allDone)} checked={allDone} />
         <label for='toggle-all'>
           Mark all as complete
         </label>
         <ul class='todo-list'>
           {
             todos.map((todo, i) => isShown(todo)
-                ? <Todo {...childState('todos', i)} idx={i} {...todo} />
+                ? <Todo idx={i} {...todo} />
                 : null)
           }
         </ul>
@@ -74,13 +67,6 @@ function render ({key, url, todos, state}, childState) {
       }
     </section>
   )
-
-  function handleKeyup (e) {
-    const text = e.target.value.trim()
-    return text && e.which === ENTER_KEY
-      ? [setText(key, ''), addTodo(text)]
-      : setText(key, text)
-  }
 
   function isShown (todo) {
     switch (activeFilter) {
@@ -95,27 +81,29 @@ function render ({key, url, todos, state}, childState) {
 }
 
 /**
+ * Local actions
+ */
+
+const setText = createAction('SET_TEXT', e => e.target.value.trim())
+const clearText = createAction('CLEAR_TEXT')
+
+/**
  * Reducer
  */
 
-function reducer (state, action) {
-  switch (action.type) {
-    case SET_TEXT:
-      return {
-        ...state,
-        text: action.payload
-      }
-  }
-
-  return state
-}
+const reducer = combineReducers({
+  text: handleActions({
+    [clearText]: () => '',
+    [setText]: (state, text) => text
+  })
+})
 
 /**
  * Exports
  */
 
-export default localize({
+export default {
   initialState,
   render,
   reducer
-})
+}

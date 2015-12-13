@@ -2,14 +2,16 @@
  * Imports
  */
 
-import {createStore, applyMiddleware} from 'redux'
-import reducer from './reducer'
-import effects from 'redux-effects'
-import fetch from 'redux-effects-fetch'
-import events from 'redux-effects-events'
 import dispatchedAt from './middleware/dispatchedAt'
-import multi from 'redux-multi'
+import {createStore, applyMiddleware} from 'redux'
+import events from 'redux-effects-events'
+import component from 'virtex-component'
+import fetch from 'redux-effects-fetch'
+import effects from 'redux-effects'
 import logger from 'redux-logger'
+import reducer from './reducer'
+import multi from 'redux-multi'
+import dom from 'virtex-dom'
 
 /**
  * Middleware
@@ -17,11 +19,13 @@ import logger from 'redux-logger'
 
  const middleware = [
    multi,
+   dom(document),
+   component,
    effects,
    events(),
    fetch,
    dispatchedAt,
-   logger
+   // logger
  ]
 
 /**

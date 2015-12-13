@@ -10,4 +10,8 @@ import store from './store'
  * App
  */
 
-document.addEventListener('DOMContentLoaded', () => vdux(store, app, document.body))
+document.addEventListener('DOMContentLoaded', () => vdux(
+  store,
+  app,
+  document.body
+))

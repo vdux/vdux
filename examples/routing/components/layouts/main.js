@@ -2,13 +2,15 @@
  * Imports
  */
 
-import element from 'vdom-element'
+import element from 'virtex-element'
 
 /**
  * Render
  */
 
-function render ({nav, children}) {
+function render ({props}) {
+  const {nav, children} = props
+
   return (
     <div>
       <div>

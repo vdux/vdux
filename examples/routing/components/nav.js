@@ -2,13 +2,15 @@
  * Imports
  */
 
-import element from 'vdom-element'
+import element from 'virtex-element'
 
 /**
  * Render
  */
 
-function render ({url}) {
+function render ({props}) {
+  const {url} = props
+
   return (
     <div>
       <a href='/'>Home</a>

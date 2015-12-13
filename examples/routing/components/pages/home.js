@@ -2,8 +2,8 @@
  * Imports
  */
 
-import element from 'vdom-element'
 import MainLayout from '../layouts/main'
+import element from 'virtex-element'
 import Nav from '../nav'
 
 /**

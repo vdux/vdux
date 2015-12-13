@@ -2,14 +2,16 @@
  * Imports
  */
 
-import {createStore} from 'redux'
+import {createStore, applyMiddleware} from 'redux'
+import dom from 'virtex-dom'
 import reducer from './reducer'
 
 /**
  * Store
  */
 
-const store = createStore(reducer, {counter: 0})
+const createStoreWithMiddleware = applyMiddleware(dom(document))(createStore)
+const store = createStoreWithMiddleware(reducer, {counter: 0})
 
 /**
  * Exports

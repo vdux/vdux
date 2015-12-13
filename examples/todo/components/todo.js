@@ -2,27 +2,12 @@
  * Imports
  */
 
-import localize, {localAction} from 'vdux-local'
-import element from 'vdom-element'
+import {removeTodo, setImportant, setCompleted, setTodoText} from '../actions/curried'
+import combineReducers from '@micro-js/combine-reducers'
+import handleActions from '@micro-js/handle-actions'
+import createAction from '@micro-js/create-action'
+import element from 'virtex-element'
 import Dropdown from './dropdown'
-import {removeTodo, setImportant, setCompleted, setTodoText} from '../actions'
-
-/**
- * Key constants
- */
-
-const ENTER_KEY = 13
-const ESCAPE_KEY = 27
-
-/**
- * Local actions
- */
-
-const BEGIN_EDIT = 'BEGIN_EDIT'
-const CANCEL_EDIT = 'CANCEL_EDIT'
-
-const beginEdit = localAction(BEGIN_EDIT)
-const cancelEdit = localAction(CANCEL_EDIT)
 
 /**
  * Initial state
@@ -38,72 +23,67 @@ function initialState () {
  * Render
  */
 
-function render ({idx, key, text, important, completed, state}, childState) {
-  const {editing} = state
+function render ({state, props, local, ref}) {
+  const {text, important, completed, idx} = props
+  const {editing, editText} = state
+  const edit = local(beginEdit, text)
+  const cancel = local(cancelEdit)
+  const submit = editText
+    ? [setTodoText(idx, editText), cancel]
+    : removeTodo(idx)
 
   return (
     <li class={{completed, important, editing}}>
-      <div class='view' ev-dblclick={() => beginEdit(key)}>
-        <input class='toggle' type='checkbox' ev-change={() => setCompleted(idx, !completed)} checked={completed} />
+      <div class='view' onDblClick={edit}>
+        <input class='toggle' type='checkbox' onChange={setCompleted(idx, !completed)} checked={completed} />
         <label style={{color: important ? 'red' : 'black'}}>
           {text}
-          <img class='options' src='css/options.png' ev-click={() => Dropdown.toggle(`${key}.dropdown`)} />
-          <Dropdown {...childState('dropdown')}>
-            <div ev-click={() => setImportant(idx, !important)}>Important</div>
-            <div ev-click={() => removeTodo(idx)}>Remove</div>
+          <img class='options' src='css/options.png' onClick={ref.to('dropdown', Dropdown.toggle)} />
+          <Dropdown ref={ref.as('dropdown')}>
+            <div onClick={setImportant(idx, !important)}>Important</div>
+            <div onClick={removeTodo(idx)}>Remove</div>
           </Dropdown>
         </label>
       </div>
       <input class='edit'
         focused={editing}
-        value={text}
-        ev-blur={e => submitEdit(e.currentTarget.value)}
-        ev-keydown={handleKeydown} />
+        value={editText}
+        onBlur={editing && submit}
+        onInput={local(setEditText)}
+        onKeyDown={{enter: submit, esc: cancel}} />
     </li>
   )
-
-  function handleKeydown (e) {
-    switch (e.which) {
-      case ENTER_KEY:
-        return submitEdit(e.currentTarget.value)
-      case ESCAPE_KEY:
-        return cancelEdit(key)
-    }
-  }
-
-  function submitEdit (str) {
-    str = str.trim()
-    return str
-      ? [setTodoText(idx, str), cancelEdit(key)]
-      : cancelEdit(key)
-  }
 }
+
+/**
+ * Local actions
+ */
+
+const beginEdit = createAction('BEGIN_EDIT')
+const cancelEdit = createAction('CANCEL_EDIT')
+const setEditText = createAction('SET_EDIT_TEXT', e => e.currentTarget.value.trim())
 
 /**
  * Local reducer
  */
 
-function reducer (state, action) {
-  switch (action.type) {
-    case BEGIN_EDIT:
-      return {
-        ...state,
-        editing: true
-      }
-    case CANCEL_EDIT:
-      return {
-        ...state,
-        editing: false
-      }
-  }
-}
+const reducer = combineReducers({
+  editing: handleActions({
+    [beginEdit]: () => true,
+    [cancelEdit]: () => false
+  }),
+  editText: handleActions({
+    [beginEdit]: (state, text) => text,
+    [setEditText]: (state, text) => text
+  })
+})
 
 /**
  * Exports
  */
 
-export default localize({
+export default {
   initialState,
   render,
   reducer
-})
+}

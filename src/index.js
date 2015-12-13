@@ -2,49 +2,79 @@
  * Imports
  */
 
-import delegate from 'delegant'
-import compose from 'compose-function'
-import {diff, patch, create} from 'virtual-dom'
+import delegant from 'delegant'
+import virtex from 'virtex'
 
 /**
  * vdux
  */
 
 function vdux (store, app, node) {
+  const {subscribe, dispatch, getState} = store
+
+  /**
+   * Initialize virtex
+   */
+
+  const {create, update} = virtex(dispatch)
+
   /**
    * Render the VDOM tree
    */
 
   let tree = render()
   let rootNode = create(tree)
-
   node.appendChild(rootNode)
 
   /**
    * Create the Virtual DOM <-> Redux cycle
    */
 
-  return compose(
-    delegate(node, action => action && store.dispatch(action)),
-    store.subscribe(update)
-  )
+  const unsubscribe = subscribe(sync)
+  const undelegate = delegant(node, action => action && dispatch(action))
+
+  /**
+   * Return an unbind function
+   */
+
+  return () => {
+    unsubscribe()
+    undelegate()
+  }
 
   /**
    * Render a new virtual dom
    */
 
   function render () {
-    return app(store.getState())
+    return app(getState())
   }
 
   /**
    * Sync the virtual dom and the actual dom
    */
 
-  function update () {
-    const newTree = render()
+  let pending = false
 
-    rootNode = patch(rootNode, diff(tree, newTree))
+  function sync () {
+    // Prevent re-entrant renders
+    if (pending) return
+    pending = true
+
+    setTimeout(syncNow)
+  }
+
+  function syncNow () {
+    pending = false
+
+    const newTree = render()
+    const newRootNode = update(tree, newTree, rootNode)
+
+    if (newRootNode !== rootNode) {
+      node.replaceChild(newRootNode, rootNode)
+      rootNode = newRootNode
+    }
+
     tree = newTree
   }
 }
