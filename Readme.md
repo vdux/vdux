@@ -109,7 +109,7 @@ export default configureStore
 Assuming you are using [virtex-local](https://github.com/ashaffer/virtex-local) and you have mounted your component local state at `app` as in the example above, you will also need to install [redux-ephemeral](https://github.com/ashaffer/redux-ephemeral) into your reducer, like this:
 
 ```javascript
-import combineReducers from '@micro-js/combine-reducers'
+import combineReducers from '@f/combine-reducers'
 import ephemeral from 'redux-ephemeral'
 
 export default combineReducers({

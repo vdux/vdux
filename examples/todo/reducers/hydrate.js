@@ -2,8 +2,7 @@
  * Imports
  */
 
-import handleActions from '@micro-js/handle-actions'
-import replace from '@micro-js/reduce-replace'
+import handleActions from '@f/handle-actions'
 import {hydrateState} from '../actions'
 
 /**
@@ -11,7 +10,7 @@ import {hydrateState} from '../actions'
  */
 
 const hydrateReducer = handleActions({
-  [hydrateState]: replace()
+  [hydrateState]: (oldState, newState) => ({...oldState, ...newState})
 })
 
 /**

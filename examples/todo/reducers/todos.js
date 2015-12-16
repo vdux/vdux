@@ -2,12 +2,12 @@
  * Imports
  */
 
-import handleActions from '@micro-js/handle-actions'
-import composeReducers from '@micro-js/compose-reducers'
-import reduceKey from '@micro-js/reduce-key'
-import rfilter from '@micro-js/reduce-filter'
-import rmap from '@micro-js/reduce-map'
-import concat from '@micro-js/concat'
+import composeReducers from '@f/compose-reducers'
+import handleActions from '@f/handle-actions'
+import rfilter from '@f/reduce-filter'
+import reduceKey from '@f/reduce-key'
+import rmap from '@f/reduce-map'
+import concat from '@f/concat'
 import {
   addTodo, removeTodo, setTodoText, setImportant,
   setCompleted, setAllCompleted, clearCompleted

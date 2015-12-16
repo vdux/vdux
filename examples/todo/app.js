@@ -3,9 +3,9 @@
  */
 
 import {addTodo, setAllCompleted} from './actions/curried'
-import combineReducers from '@micro-js/combine-reducers'
-import handleActions from '@micro-js/handle-actions'
-import createAction from '@micro-js/create-action'
+import combineReducers from '@f/combine-reducers'
+import handleActions from '@f/handle-actions'
+import createAction from '@f/create-action'
 import Footer from './components/footer'
 import element from 'virtex-element'
 import Todo from './components/todo'

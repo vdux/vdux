@@ -68,13 +68,7 @@ function vdux (store, app, node) {
     pending = false
 
     const newTree = render()
-    const newRootNode = update(tree, newTree, rootNode)
-
-    if (newRootNode !== rootNode) {
-      node.replaceChild(newRootNode, rootNode)
-      rootNode = newRootNode
-    }
-
+    update(tree, newTree)
     tree = newTree
   }
 }

@@ -4,7 +4,7 @@
 
 import {bind} from 'redux-effects'
 import {bindUrl} from 'redux-effects-location'
-import createAction from '@micro-js/create-action'
+import createAction from '@f/create-action'
 import {setItem, getItem} from 'redux-effects-localstorage'
 
 /**

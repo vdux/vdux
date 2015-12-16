@@ -2,7 +2,7 @@
  * Imports
  */
 
-import curryAll from '@micro-js/curry-all'
+import curryAll from '@f/curry-all'
 import * as actions from '.'
 
 /**
