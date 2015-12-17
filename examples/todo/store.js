@@ -2,28 +2,20 @@
  * Imports
  */
 
-import {createStore, applyMiddleware} from 'redux'
-import reducer from './reducers'
-import effects from 'redux-effects'
-import events from 'redux-effects-events'
-import location from 'redux-effects-location'
 import localstorage from 'redux-effects-localstorage'
-import local from 'virtex-local'
+import location from 'redux-effects-location'
 import persist from './middleware/persist'
-import multi from 'redux-multi'
+import events from 'redux-effects-events'
+import effects from 'redux-effects'
 import logger from 'redux-logger'
-import dom from 'virtex-dom'
-import component from 'virtex-component'
+import reducer from './reducers'
+import client from 'vdux-client'
 
 /**
  * Middleware
  */
 
 const middleware = [
-  local('app'),
-  component,
-  dom(document),
-  multi,
   effects,
   localstorage(window.localStorage),
   events(),
@@ -37,7 +29,7 @@ const middleware = [
  */
 
 function configureStore (initialState) {
-  return applyMiddleware(...middleware)(createStore)(reducer, initialState)
+  return client(...middleware)(reducer, initialState)
 }
 
 /**

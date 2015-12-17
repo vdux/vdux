@@ -17,7 +17,6 @@ export default composeReducers(
   hydrateReducer,
   combineReducers({
     todos: todosReducer,
-    url: urlReducer,
-    app: ephemeral
+    url: urlReducer
   })
 )
