@@ -45,7 +45,7 @@
     "redux-multi": "^0.1.8",
     "standard": "^5.1.0",
     "tape": "^4.2.0",
-    "vdux-client": "^0.2.3",
+    "vdux-preset-client": "^0.2.3",
     "virtex-dom": "^0.1.4",
     "virtex-element": "^0.1.5"
   }

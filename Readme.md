@@ -64,60 +64,38 @@ Almost side-effect free, anyway. You still need to do things like issue requests
   * [redux-ephemeral](https://github.com/ashaffer/redux-ephemeral) - Allows your reducer to manage transient local state (i.e. component local state).
   * [redux-multi](https://github.com/ashaffer/redux-multi) - Allows you to dispatch multiple actions by returning an array. This isn't strictly necessary, but it's highly recommended.
 
-## Wiring
+## Middleware
 
-vdux, virtex, et. al and you are free to create your own rendering backends, JSX pragmas, component middleware, local state middleware, or any other type of middleware you want. You can intercede in any aspect of the rendering pipeline that you need by adding redux middleware. This extensibility and modularity comes at some setup cost, however. Getting started requires a bit of middleware boilerplate, but you can basically just copy/paste this to start rapidly:
+vdux requires a fair bit of middleware to work correctly. To make this easier on you, there is a preset DOM middleware stack: [vdux-preset-client](https://github.com/ashaffer/vdux-preset-client). This gives you: components, local state, and DOM rendering. You use it like this:
 
 ```javascript
-/**
- * Imports
- */
-
-import {createStore, applyMiddleware} from 'redux'
-import component from 'virtex-component'
-import local from 'virtex-local'
+import vdux from 'vdux'
+import client from 'vdux-preset-client'
 import reducer from './reducer'
-import dom from 'virtex-dom'
+import thunk from 'redux-thunk'
+import app from './app'
 
 /**
- * Middleware
+ * Your application's redux middleware
  */
 
 const middleware = [
-  // mount your component local state into 'app' in your
-  // redux state atom
-  local('app'),
-  component,
-  dom(document)
+  thunk,
+  // .. other middleware
 ]
 
-/**
- * Store
- */
+const initialState = {}
+const configStore = client(...middleware)
+const store = configStore(reducer, initialState)
 
-function configureStore (initialState) {
-  return applyMiddleware(...middleware)(createStore)(reducer, initialState)
-}
-
-/**
- * Exports
- */
-
-export default configureStore
+document.addEventListener('DOMContentLoaded', () => vdux(
+  store,
+  app,
+  document.body
+))
 ```
 
-Assuming you are using [virtex-local](https://github.com/ashaffer/virtex-local) and you have mounted your component local state at `app` as in the example above, you will also need to install [redux-ephemeral](https://github.com/ashaffer/redux-ephemeral) into your reducer, like this:
-
-```javascript
-import combineReducers from '@f/combine-reducers'
-import ephemeral from 'redux-ephemeral'
-
-export default combineReducers({
-  app: ephemeral
-  // ... other reducers
-})
-```
-
+If you'd like to use a custom middleware stack, you should look at [vdux-preset-client](https://github.com/ashaffer/vdux-preset-client) and see how it works (it's very simple).
 
 ## License
 
