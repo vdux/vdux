@@ -74,7 +74,7 @@ Components in vdux are handled by middleware. The de-facto solution is: [virtex-
 Each `render` call receives a `model`. Other middleware may augment your model, but by itself [virtex-component](https://github.com/ashaffer/virtex-component) gives you:
 
   * `props` - The arguments passed in by your parent. E.g. `<Counter color="blue" />` produces props of: `{color: "blue"}`.
-  * `children` - The child elements of your component. E.g. `<Dropdown><li>item</li></Dropdown>`. Receives children of: `[<li>item</li>]`
+  * `children` - The child elements of your component. E.g. `<Dropdown><li>item</li></Dropdown>` receives children of: `[<li>item</li>]`
   * `path` - The dotted path to your component in the DOM tree. E.g. `0.1.4` (these numbers represent the index of your component into the list at each layer of the DOM tree. These indices will be replaced by keys if you use a `key` prop in one of your component's ancestors). For the most part, you probably don't need to worry about this yet.
 
 ### shouldUpdate
