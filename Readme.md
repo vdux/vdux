@@ -29,6 +29,41 @@ From then on, when your `store` emits a state update, your new state atom will b
   * `app` - A pure function that takes a single argument, state, and returns a virtual-dom tree.
   * `node` - The DOM node in which to render `app`.
 
+## Middleware
+
+vdux requires a fair bit of middleware to work correctly. To make this easier on you, there is a preset DOM middleware stack: [vdux-preset-client](https://github.com/ashaffer/vdux-preset-client). This gives you: components, local state, and DOM rendering. You use it like this:
+
+```javascript
+import vdux from 'vdux'
+import client from 'vdux-preset-client'
+import reducer from './reducer'
+import thunk from 'redux-thunk'
+import app from './app'
+
+/**
+ * Your application's redux middleware
+ */
+
+const middleware = [
+  thunk,
+  // .. other middleware
+]
+
+const initialState = {}
+const configStore = client(...middleware)
+const store = configStore(reducer, initialState)
+
+document.addEventListener('DOMContentLoaded', () => {
+  vdux(
+    store,
+    app,
+    document.body
+  ))
+})
+```
+
+If you'd like to use a custom middleware stack, you should look at [vdux-preset-client](https://github.com/ashaffer/vdux-preset-client) and see how it works (it's very simple). Once you get comfortable, you can create your own custom middleware that does almost anything you can think of: validation (of props, for instance), declarative data fetching, etc..Middleware is extremely powerful and flexible.
+
 ## DOM Events / Actions
 
 Your event handlers are pure functions that return a value. That value is then dispatched into redux. This forms a [cycle](https://github.com/cyclejs/cycle-core) that will define your entire application in a side-effect free way.
@@ -73,8 +108,8 @@ Components in vdux are handled by middleware. The de-facto solution is: [virtex-
 
 Each `render` call receives a `model`. Other middleware may augment your model, but by itself [virtex-component](https://github.com/ashaffer/virtex-component) gives you:
 
-  * `props` - The arguments passed in by your parent. E.g. `<Counter color="blue" />` produces props of: `{color: "blue"}`.
-  * `children` - The child elements of your component. E.g. `<Dropdown><li>item</li></Dropdown>`. Receives children of: `[<li>item</li>]`
+  * `props` - The arguments passed in by your parent.
+  * `children` - The child elements of your component.
   * `path` - The dotted path to your component in the DOM tree. E.g. `0.1.4` (these numbers represent the index of your component into the list at each layer of the DOM tree. These indices will be replaced by keys if you use a `key` prop in one of your component's ancestors). For the most part, you probably don't need to worry about this yet.
 
 ### shouldUpdate
@@ -202,39 +237,6 @@ export default {
 ```
 
 Internally, all `ref.to` is doing is using `<Dropdown/>`'s `local` function to send it a message in the same way it sends actions to itself.
-
-## Middleware
-
-vdux requires a fair bit of middleware to work correctly. To make this easier on you, there is a preset DOM middleware stack: [vdux-preset-client](https://github.com/ashaffer/vdux-preset-client). This gives you: components, local state, and DOM rendering. You use it like this:
-
-```javascript
-import vdux from 'vdux'
-import client from 'vdux-preset-client'
-import reducer from './reducer'
-import thunk from 'redux-thunk'
-import app from './app'
-
-/**
- * Your application's redux middleware
- */
-
-const middleware = [
-  thunk,
-  // .. other middleware
-]
-
-const initialState = {}
-const configStore = client(...middleware)
-const store = configStore(reducer, initialState)
-
-document.addEventListener('DOMContentLoaded', () => vdux(
-  store,
-  app,
-  document.body
-))
-```
-
-If you'd like to use a custom middleware stack, you should look at [vdux-preset-client](https://github.com/ashaffer/vdux-preset-client) and see how it works (it's very simple).
 
 ## Server-side rendering
 
