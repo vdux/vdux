@@ -116,7 +116,7 @@ Each `render` call receives a `model`. Other middleware may augment your model, 
 
 By default, this is taken care of for you. [virtex-component](https://github.com/ashaffer/virtex-component) assumes that your data is immutable, and will do a shallow equality check on `props` and `children` to decide if your component needs to re-render. If you want to implement your own, it works like this (this is the one [virtex-component](https://github.com/ashaffer/virtex-component) uses):
 
-```
+```js
 function shouldUpdate (prev, next) {
   return !arrayEqual(prev.children, next.children) || !objectEqual(prev.props, next.props)
 }
@@ -162,8 +162,8 @@ function initialState () {
   }
 }
 
-function render ({local, props}) {
-  return <div onClick={local(increment)}>Counter: {props.counter}</div>
+function render ({local, state}) {
+  return <div onClick={local(increment)}>Counter: {state.counter}</div>
   )
 }
 
