@@ -6,7 +6,7 @@ import {handleOnce} from 'redux-effects-events'
 import {initializeApp} from './actions'
 import element from 'virtex-element'
 import createStore from './store'
-import vdux from '../../src'
+import vdux from '../../src/dom'
 import App from './app'
 
 /**
