@@ -16,21 +16,16 @@ Stateless virtual dom &lt;-&gt; Redux.
 ## Minimal counter example
 
 ```javascript
-import element from 'vdux/element'
-import vdux from 'vdux/dom'
+import {dom as vdux, element} from 'vdux'
 import ready from 'domready'
 
 /**
- * initialState
+ * Initialize the app
  */
 
 const initialState = {
   counter: 0
 }
-
-/**
- * Initialize the app
- */
 
 ready(() => vdux({
   reducer,
@@ -44,18 +39,9 @@ ready(() => vdux({
 
 const Counter = {
   render ({props}) {
-    return (
-      <div>
-        <div>Value: {props.value}</div>
-        <button onClick={increment}>Increment counter</button>
-      </div>
-    )
+    return <div onClick={increment}>Value: {props.value}</div>
   }
 }
-
-/**
- * Plain 'increment' action creator
- */
 
 function increment () {
   return {
@@ -63,16 +49,10 @@ function increment () {
   }
 }
 
-/**
- * State reducer
- */
-
 function reducer (state, action) {
-  if (action.type === 'INCREMENT') {
-    return {
-      ...state,
-      counter: state.counter + 1
-    }
+  switch (action.type) {
+    case 'INCREMENT':
+      return {...state, counter: state.counter + 1}
   }
 
   return state
