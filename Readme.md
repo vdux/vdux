@@ -27,6 +27,15 @@ const initialState = {
   counter: 0
 }
 
+function reducer (state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return {...state, counter: state.counter + 1}
+  }
+
+  return state
+}
+
 ready(() => vdux({
   reducer,
   initialState,
@@ -47,15 +56,6 @@ function increment () {
   return {
     type: 'INCREMENT'
   }
-}
-
-function reducer (state, action) {
-  switch (action.type) {
-    case 'INCREMENT':
-      return {...state, counter: state.counter + 1}
-  }
-
-  return state
 }
 ```
 
