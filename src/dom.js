@@ -2,7 +2,8 @@
  * Imports
  */
 
-import {createStore, applyMiddleware} from 'redux'
+import applyMiddleware from 'redux/lib/utils/applyMiddleware'
+import createStore from 'redux/lib/createStore'
 import component from 'virtex-component'
 import ephemeral from 'redux-ephemeral'
 import empty from '@f/empty-element'
