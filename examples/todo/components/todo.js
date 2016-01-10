@@ -34,7 +34,7 @@ function render ({state, props, local, ref}) {
 
   return (
     <li class={{completed, important, editing}}>
-      <div class='view' onDblClick={edit}>
+      <div class='view' onDblclick={edit}>
         <input class='toggle' type='checkbox' onChange={setCompleted(idx, !completed)} checked={completed} />
         <label style={{color: important ? 'red' : 'black'}}>
           {text}

@@ -19,7 +19,7 @@ import multi from 'redux-multi'
   events(),
   fetch,
   dispatchedAt,
-  logger
+  logger()
 ]
 
 /**

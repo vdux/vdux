@@ -22,7 +22,7 @@ const middleware = [
   events(),
   location(),
   persist,
-  logger
+  logger()
 ]
 
 /**

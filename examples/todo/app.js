@@ -51,7 +51,7 @@ function render ({props, state, local}) {
           class='new-todo'
           autofocus
           type='text'
-          onInput={local(setText)}
+          onInput={[local(setText), () => console.log('input')]}
           onKeyDown={{enter: text && submit}}
           value={state.text}
           placeholder='What needs to be done?' />
