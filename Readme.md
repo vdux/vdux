@@ -16,7 +16,8 @@ Stateless virtual dom &lt;-&gt; Redux.
 ## Minimal counter example
 
 ```javascript
-import {dom as vdux, element} from 'vdux'
+import vdux from 'vdux/dom'
+import element from 'vdux/element'
 import ready from 'domready'
 
 /**
