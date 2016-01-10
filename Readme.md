@@ -51,6 +51,16 @@ export default function render () {
 }
 ```
 
+### babelrc
+
+Put this in your babelrc and `npm install babel-plugin-transform-react-jsx` to make JSX work with `element`.
+
+```json
+"plugins": [
+    ["transform-react-jsx", {"pragma": "element"}]
+  ]
+```
+
 ## DOM Events / Actions
 
 Your event handlers are pure functions that return a value. That value is then dispatched into redux. This forms a [cycle](https://github.com/cyclejs/cycle-core) that will define your entire application in a side-effect free way.
