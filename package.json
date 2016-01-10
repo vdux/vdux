@@ -17,7 +17,7 @@
     "virtex": "^0.2.1",
     "virtex-component": "^0.1.11",
     "virtex-dom": "^0.2.2",
-    "virtex-element": "^0.2.1",
+    "virtex-element": "^0.2.2",
     "virtex-local": "^0.2.1",
     "virtex-string": "^0.3.1"
   },

@@ -13,18 +13,70 @@ Stateless virtual dom &lt;-&gt; Redux.
 
     $ cd examples/basic && budo --live index.js -- -t babelify
 
-## Initialization
+## Minimal counter example
 
 ```javascript
-import reducer from './reducer'
-import ready from 'domready'
+import element from 'vdux/element'
 import vdux from 'vdux/dom'
-import app from './app'
+import ready from 'domready'
+
+/**
+ * initialState
+ */
+
+const initialState = {
+  counter: 0
+}
+
+/**
+ * Initialize the app
+ */
 
 ready(() => vdux({
   reducer,
-  app
+  initialState,
+  app: state => <Counter value={state.counter} />
 }))
+
+/**
+ * App
+ */
+
+const Counter = {
+  render ({props}) {
+    return (
+      <div>
+        <div>Value: {props.value}</div>
+        <button onClick={increment}>Increment counter</button>
+      </div>
+    )
+  }
+}
+
+/**
+ * Plain 'increment' action creator
+ */
+
+function increment () {
+  return {
+    type: 'INCREMENT'
+  }
+}
+
+/**
+ * State reducer
+ */
+
+function reducer (state, action) {
+  if (action.type === 'INCREMENT') {
+    return {
+      ...state,
+      counter: state.counter + 1
+    }
+  }
+
+  return state
+}
 ```
 
 ## Usage
