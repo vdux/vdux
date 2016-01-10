@@ -131,6 +131,76 @@ function increment () {
 export default render
 ```
 
+### Event names
+
+Also of note, vdux is unopinionated about the casing of event handler prop names. If you are wondering if it's `onKeyDown` or `onKeydown`, both/all will work, even `ONKEYDOWN`, or `onkeydown`. As long as it matches the case-insensitive regex `on(?:domEventNames.join('|'))`, it'll work. If you want to know whether an event you want is included, check out [dom-events](https://github.com/micro-js/dom-events) for the complete list - and if one you want isn't there, just send a PR to that module.
+
+## `element` sugar
+
+The JSX pragma `element` comes with a bit of syntactic sugar to make your life easier out of the box. If you don't like its opinions or don't use its features and don't want them bloating your bundle, you can write your own on top of the `element` exported by [virtex](https://github.com/ashaffer/virtex) and use that instead.
+
+### events
+
+If you want to do more than one thing in response to an event, you can pass an array of handlers, like this:
+
+```javascript
+function render () {
+  return <div onClick={[fetchPosts, closeDropdown]}></div>
+}
+```
+
+The return values of both handlers will be dispatched into redux. There is also a set of special syntax for keyboard related events - you may pass an object containing the particular [keychords](https://github.com/micro-js/keychord) you want to select for. E.g.
+
+```javascript
+function render () {
+  return <input onKeydown={{enter: submit, esc: cancel, 'shift+enter': newline}} />
+}
+```
+
+## Inline styles
+
+`element` includes some minimal inline style sugar for you. It won't do autoprefixing or anything complicated, but you can pass in a basic style object and have it turned into a style string, automatically. E.g.
+
+```javascript
+function render () {
+  return <div style={{color: 'red', fontWeight: 'normal'}}></div>
+}
+```
+
+Will produce a style string of `'color: red; font-weight: normal'`.
+
+## Class names
+
+The [classnames](https://github.com/JedWatson/classnames) module is used for this. So you can do:
+
+```javascript
+function render () {
+  return <div class={['primary', 'button']}>hello world</div>
+}
+```
+
+Or you can do:
+
+```javascript
+function render ({props}) {
+  return <div class={{primary: !!props.primary, button: true}}>hello world</div>
+}
+```
+
+You can also recursively mix and match these things, like `['class1', {class2: props.class2}]`.
+
+## Focus
+
+`element` allows you to declaratively focus on an element by setting the `focused` property to true. Like this:
+
+```javascript
+function render ({props}) {
+  return <input focused={props.shouldFocus} />
+}
+```
+
+Do be careful though that you're not setting `focused` on multiple elements at the same time, otherwise which one ends up actually receiving focus will be undefined (and amount to which one renders first).
+
 ## Components
 
 Components in vdux look a lot like components in other virtual dom libraries. You have a `render`, and some lifecycle hooks. Your `render` function receives a `model` that looks like this:
