@@ -3,7 +3,7 @@
  */
 
 import MainLayout from '../layouts/main'
-import element from 'virtex-element'
+import element from '../../../../element'
 import Posts from '../posts'
 import Nav from '../nav'
 

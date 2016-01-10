@@ -3,7 +3,7 @@
 
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://github.com/feross/standard)
 
-Stateless virtual dom &lt;-&gt; Redux
+Stateless virtual dom &lt;-&gt; Redux.
 
 ## Installation
 
@@ -13,56 +13,43 @@ Stateless virtual dom &lt;-&gt; Redux
 
     $ cd examples/basic && budo --live index.js -- -t babelify
 
-## Setup
-
-vdux takes a stateless [virtual dom](https://github.com/ashaffer/virtex), and wires it to a [redux](https://github.com/rackt/redux) store.  You call it like this:
+## Initialization
 
 ```javascript
-vdux(store, app, node)
-```
-
-From then on, when your `store` emits a state update, your new state atom will be passed to `app`, which will render into `rootNode`.
-
-### Params
-
-  * `store` - A redux store.
-  * `app` - A pure function that takes a single argument, state, and returns a virtual-dom tree.
-  * `node` - The DOM node in which to render `app`.
-
-## Middleware
-
-vdux requires a fair bit of middleware to work correctly. To make this easier on you, there is a preset DOM middleware stack: [vdux-preset-client](https://github.com/ashaffer/vdux-preset-client). This gives you: components, local state, and DOM rendering. You use it like this:
-
-```javascript
-import vdux from 'vdux'
-import client from 'vdux-preset-client'
 import reducer from './reducer'
-import thunk from 'redux-thunk'
+import ready from 'domready'
+import vdux from 'vdux/dom'
 import app from './app'
 
-/**
- * Your application's redux middleware
- */
-
-const middleware = [
-  thunk,
-  // .. other middleware
-]
-
-const initialState = {}
-const configStore = client(...middleware)
-const store = configStore(reducer, initialState)
-
-document.addEventListener('DOMContentLoaded', () => {
-  vdux(
-    store,
-    app,
-    document.body
-  ))
-})
+ready(() => vdux({
+  reducer,
+  app
+}))
 ```
 
-If you'd like to use a custom middleware stack, you should look at [vdux-preset-client](https://github.com/ashaffer/vdux-preset-client) and see how it works (it's very simple). Once you get comfortable, you can create your own custom middleware that does almost anything you can think of: validation (of props, for instance), declarative data fetching, etc..Middleware is extremely powerful and flexible.
+## Usage
+
+vdux is an opionated, higher-level abstraction over [redux](https://github.com/rackt/redux) and [virtex](https://github.com/ashaffer/virtex). To initialize it, it takes a single object containing several parameters:
+
+  * `middleware` - An array containing redux middleware you want to use. Defaults to `[]`.
+  * `reducer` - Your root redux reducer
+  * `initialState` - The initial state atom for your application. Defaults to `{}`.
+  * `app` - A function that accepts `state` and returns a virtual node tree
+  * `node` - The root node you want to render `app` into. Defaults to `document.body`.
+
+Once you call vdux with these parameters, you're done. Your application's primary state <-> UI loop is established. From this point forward, nothing your code does will be imperative - every function will accept parameters and return a value, and that's it.
+
+## JSX / Hyperscript
+
+vdux's JSX pragma is accessible on `vdux/element`. E.g.
+
+```javascript
+import element from 'vdux/element'
+
+export default function render () {
+  return <div>Hello world!</div>
+}
+```
 
 ## DOM Events / Actions
 
@@ -71,7 +58,7 @@ Your event handlers are pure functions that return a value. That value is then d
 Using hyperscript:
 
 ```javascript
-import h from 'virtex-element'
+import h from 'vdux/element'
 
 function counter ({props}) {
   return h('div', {'onClick': increment}, ['Value: ' + props.counter])
@@ -87,7 +74,7 @@ function increment () {
 Or using JSX:
 
 ```javascript
-import element from 'virtex-element'
+import element from 'vdux/element'
 
 function render ({props}) {
   return <div onClick={increment}>Value: {props.counter}</div>
@@ -104,19 +91,20 @@ export default render
 
 ## Components
 
-Components in vdux are handled by middleware. The de-facto solution is: [virtex-component](https://github.com/ashaffer/virtex-component). It gives you `render`, some hooks and `shouldUpdate`. You may also export stateless function components, just like [react](https://github.com/facebook/react) and [deku](https://github.com/dekujs/deku).
+Components in vdux look a lot like components in other virtual dom libraries. You have a `render`, and some lifecycle hooks. Your `render` function receives a `model` that looks like this:
 
-Each `render` call receives a `model`. Other middleware may augment your model, but by itself [virtex-component](https://github.com/ashaffer/virtex-component) gives you:
-
-  * `props` - The arguments passed in by your parent.
-  * `children` - The child elements of your component.
-  * `path` - The dotted path to your component in the DOM tree. E.g. `0.1.4` (these numbers represent the index of your component into the list at each layer of the DOM tree. These indices will be replaced by keys if you use a `key` prop in one of your component's ancestors). For the most part, you probably don't need to worry about this yet.
+  * `props` - The arguments passed in by your parent
+  * `children` - The child elements of your component
+  * `state` - The state of your component
+  * `local` - Directs an action to the current component's reducer (see the local state section)
+  * `ref` - Direct an action to another component's reducer (see the local state section)
+  * `path` - The dotted path to your component in the DOM tree. For the most part, you probably don't need to worry about this.
 
 ### shouldUpdate
 
 By default, this is taken care of for you. [virtex-component](https://github.com/ashaffer/virtex-component) assumes that your data is immutable, and will do a shallow equality check on `props` and `children` to decide if your component needs to re-render. If you want to implement your own, it works like this (this is the one [virtex-component](https://github.com/ashaffer/virtex-component) uses):
 
-```js
+```javascript
 function shouldUpdate (prev, next) {
   return !arrayEqual(prev.children, next.children) || !objectEqual(prev.props, next.props)
 }
@@ -134,19 +122,7 @@ Where `prev` is the previous model and `next` is the next model.
 
 ## Local state
 
-Like components, local state is handled by middleware. Here, opinions diverge quite a bit on what the best practices are. vdux was designed specifically to address this issue - and can support any/all major philosophies on this subject. As I see them, they are:
-
-  * True local state (what React does)
-  * Single state cursor with manual propagation (e.g. [react-cursor](https://github.com/dustingetz/react-cursor))
-  * Monadic pseudo-local state (e.g. [virtex-local](https://github.com/ashaffer/virtex-local))
-
-vdux & [virtex](https://github.com/ashaffer/virtex) were designed expressly to make the third of these possible, so that is what i'll discuss here. What that means is just that all of your state is kept in your global redux state atom, and your local state middleware will pluck out the appropriate state object from the global state atom and pass it to you whenever your component needs it, keeping your rendering tree functionally pure. If you put [virtex-local](https://github.com/ashaffer/virtex-local) in your middleware stack, your components models will be augmented with some new properties:
-
-  * `state` - Your component's state
-  * `local` - A curried function that directs actions to your component.
-  * `ref` - Used for inter-component communication, and analogous to React's refs.
-
-Your component may also now export some new functions:
+In vdux, all of your state is kept in your global redux state atom under the `ui` property. In order to support component local state, your component may export two additional functions:
 
   * `initialState` - Receives `model` and returns the starting state for your component.
   * `reducer` - A reducing function for your component's state. Receives `(state, action)` and returns a new state.
@@ -250,8 +226,15 @@ Almost side-effect free, anyway. You still need to do things like issue requests
   * [redux-thunk](https://github.com/gaearon/redux-thunk)
   * [redux-promise](https://github.com/acdlite/redux-promise)
 
-## Ecosystem
+## Suggested middleware
 
+  * [redux-multi](https://github.com/ashaffer/redux-multi) - Highly recommended, without this, you'll only be able to return one action at a time, which is severely limiting. Use this to return arrays of actions to be dispatched.
+
+## Submodules / Ecosystem
+
+vdux itself is very small. It is primarily composed of other, smaller modules:
+
+  * [redux](https://github.com/rackt/redux) - Functional state container.
   * [virtex](https://github.com/ashaffer/virtex) - The redux-based virtual dom library used by vdux. You don't need to use this - it's already in vdux, but you will need to add virtex middleware to your redux middleware stack.
   * [virtex-element](https://github.com/ashaffer/virtex-element) - A high-level, opionated JSX pragma for virtex nodes. You probably want to use this for getting started, but later on you may be interested in adding your own sugary element creators.
   * [virtex-dom](https://github.com/ashaffer/virtex-dom) - DOM rendering redux middleware backend for virtex. You need this if you want to be rendering DOM nodes.
@@ -259,7 +242,8 @@ Almost side-effect free, anyway. You still need to do things like issue requests
   * [virtex-component](https://github.com/ashaffer/virtex-component) - Lets virtex understand components. Adds nice react/deku-style components with hooks, `shouldUpdate`, and other civilized things.
   * [virtex-local](https://github.com/ashaffer/virtex-local) - Give your components local state, housed inside your redux state atom. Note that you will also need [redux-ephemeral](https://github.com/ashaffer/redux-ephemeral) mounted into your reducer for this to work.
   * [redux-ephemeral](https://github.com/ashaffer/redux-ephemeral) - Allows your reducer to manage transient local state (i.e. component local state).
-  * [redux-multi](https://github.com/ashaffer/redux-multi) - Allows you to dispatch multiple actions by returning an array. This isn't strictly necessary, but it's highly recommended.
+
+If you want to try something more advanced, you can create your own vdux by composing these modules and inserting others in your own way.
 
 ## License
 

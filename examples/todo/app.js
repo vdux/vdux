@@ -7,8 +7,17 @@ import combineReducers from '@f/combine-reducers'
 import handleActions from '@f/handle-actions'
 import createAction from '@f/create-action'
 import Footer from './components/footer'
-import element from 'virtex-element'
+import {initializeApp} from './actions'
+import element from '../../element'
 import Todo from './components/todo'
+
+/**
+ * beforeMount
+ */
+
+function beforeMount () {
+  return initializeApp()
+}
 
 /**
  * initialState
@@ -103,6 +112,7 @@ const reducer = combineReducers({
  */
 
 export default {
+  beforeMount,
   initialState,
   render,
   reducer

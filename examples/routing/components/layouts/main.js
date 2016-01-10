@@ -2,7 +2,7 @@
  * Imports
  */
 
-import element from 'virtex-element'
+import element from '../../../../element'
 
 /**
  * Render

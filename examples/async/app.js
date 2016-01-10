@@ -5,7 +5,7 @@
 import {requestPosts, selectReddit} from './actions'
 import Picker from './components/picker'
 import Posts from './components/posts'
-import element from 'virtex-element'
+import element from '../../element'
 
 /**
  * beforeMount

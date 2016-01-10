@@ -62,7 +62,7 @@ function postsDidLoad (posts) {
  * Exports
  */
 
-export default {
+export {
   // Action creators
   initializeApp,
   fetchPosts,

@@ -2,16 +2,25 @@
  * Imports
  */
 
-import vdux from '../../src'
+import domready from '@f/domready'
+import vdux from '../../src/dom'
+import reducer from './reducer'
 import app from './app'
-import store from './store'
+
+/**
+ * initialState
+ */
+
+const initialState = {
+  counter: 0
+}
 
 /**
  * App
  */
 
-document.addEventListener('DOMContentLoaded', () => vdux(
-  store,
-  app,
-  document.body
-))
+domready(() => vdux({
+  reducer,
+  initialState,
+  app
+}))

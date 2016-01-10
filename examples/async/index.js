@@ -2,29 +2,37 @@
  * Imports
  */
 
-import {handleOnce} from 'redux-effects-events'
-import element from 'virtex-element'
-import createStore from './store'
-import vdux from '../../src'
+import middleware from './middleware'
+import element from '../../element'
+import domready from '@f/domready'
+import vdux from '../../src/dom'
+import reducer from './reducer'
 import App from './app'
 
 /**
- * Setup store
+ * initialState
  */
 
-const store = createStore({
+const initialState = {
   reddit: 'reactjs',
   posts: []
-})
+}
+
+/**
+ * Initialize
+ */
+
+domready(() => vdux({
+  middleware,
+  reducer,
+  initialState,
+  app
+}))
 
 /**
  * App
  */
 
-store.dispatch(handleOnce('domready', () => {
-  vdux(
-    store,
-    state => <App {...state} />,
-    document.body
-  )
-}))
+function app (state) {
+  return <App {...state} />
+}

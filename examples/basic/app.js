@@ -2,7 +2,7 @@
  * Imports
  */
 
-import h from 'virtex-element'
+import h from '../../element'
 
 /**
  * App

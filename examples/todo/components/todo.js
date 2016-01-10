@@ -6,7 +6,7 @@ import {removeTodo, setImportant, setCompleted, setTodoText} from '../actions/cu
 import combineReducers from '@f/combine-reducers'
 import handleActions from '@f/handle-actions'
 import createAction from '@f/create-action'
-import element from 'virtex-element'
+import element from '../../../element'
 import Dropdown from './dropdown'
 
 /**

@@ -3,11 +3,9 @@
  */
 
 import {createStore, applyMiddleware} from 'redux'
-import compose from '@f/compose-middleware'
 import component from 'virtex-component'
 import ephemeral from 'redux-ephemeral'
 import empty from '@f/empty-element'
-import terminal from './terminal'
 import local from 'virtex-local'
 import delegant from 'delegant'
 import dom from 'virtex-dom'
@@ -17,49 +15,38 @@ import virtex from 'virtex'
  * vdux
  */
 
-function vdux (middleware, reducer, initialState, app, node) {
+function vdux ({middleware = [], reducer, initialState = {}, app, node = document.body}) {
   /**
    * Create redux store
    */
 
-  const store = applyMiddleware(...middleware)(createStore)(ephemeral('ui', reducer), initialState)
+  const store = applyMiddleware(dom, local('ui'), component, ...middleware)(createStore)(ephemeral('ui', reducer), initialState)
 
   /**
    * Initialize virtex
    */
 
-  const stack = compose([dom, local('ui'), component])
-  const {create, update} = virtex(stack(store)(terminal))
+  const {create, update} = virtex(store.dispatch)
 
   /**
    * Empty the root node
    */
 
-   empty(node)
+  empty(node)
 
   /**
    * Render the VDOM tree
    */
 
   let tree = render()
-  let rootNode = create(tree).element
-  node.appendChild(rootNode)
+  node.appendChild(create(tree).element)
 
   /**
    * Create the Virtual DOM <-> Redux cycle
    */
 
-  const unsubscribe = store.subscribe(sync)
-  const undelegate = delegant(node, action => action && store.dispatch(action))
-
-  /**
-   * Return an unbind function
-   */
-
-  return () => {
-    unsubscribe()
-    undelegate()
-  }
+  store.subscribe(sync)
+  delegant(node, action => action && store.dispatch(action))
 
   /**
    * Render a new virtual dom

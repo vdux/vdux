@@ -3,12 +3,10 @@
  */
 
 import {createStore, applyMiddleware} from 'redux'
-import compose from '@f/compose-middleware'
 import component from 'virtex-component'
 import ephemeral from 'redux-ephemeral'
-import terminal from './terminal'
-import local from 'virtex-local'
 import string from 'virtex-string'
+import local from 'virtex-local'
 import virtex from 'virtex'
 
 /**
@@ -20,14 +18,13 @@ function vdux (middleware, reducer, initialState, app, ready = () => true) {
    * Create redux store
    */
 
-  const store = applyMiddleware(...middleware)(createStore)(ephemeral('ui', reducer), initialState)
+  const store = applyMiddleware(string, local('ui'), component, ...middleware)(createStore)(ephemeral('ui', reducer), initialState)
 
   /**
    * Initialize virtex
    */
 
-  const stack = compose([string, local('ui'), component])
-  const {create} = virtex(stack(store)(terminal))
+  const {create} = virtex(store.dispatch)
 
   /**
    * Render the VDOM tree
@@ -38,8 +35,6 @@ function vdux (middleware, reducer, initialState, app, ready = () => true) {
   /**
    * Create the Virtual DOM <-> Redux cycle
    */
-
-  const unsubscribe = store.subscribe(sync)
 
   return new Promise((resolve, reject) => {
     render()

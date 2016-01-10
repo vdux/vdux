@@ -3,7 +3,7 @@
  */
 
 import {initializeApp} from './actions'
-import element from 'virtex-element'
+import element from '../../element'
 import router from './router'
 
 /**

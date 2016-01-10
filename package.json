@@ -10,16 +10,18 @@
     "postpublish": "rm -rf lib"
   },
   "dependencies": {
-    "@f/compose-middleware": "^2.0.0",
+    "@f/empty-element": "^1.0.0",
     "delegant": "^0.1.3",
     "redux-ephemeral": "^0.1.9",
-    "virtex": "^0.1.17",
+    "virtex": "^0.2.0",
     "virtex-component": "^0.1.10",
-    "virtex-dom": "^0.1.24",
-    "virtex-local": "^0.1.14",
+    "virtex-dom": "^0.2.0",
+    "virtex-element": "^0.1.5",
+    "virtex-local": "^0.2.1",
     "virtex-string": "^0.3.0"
   },
   "devDependencies": {
+    "@f/domready": "^1.0.0",
     "@f/combine-reducers": "^1.0.3",
     "@f/compose-reducers": "^1.1.1",
     "@f/concat": "^1.0.0",

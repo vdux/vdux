@@ -2,7 +2,6 @@
  * Imports
  */
 
-import {applyMiddleware, createStore} from 'redux'
 import localstorage from 'redux-effects-localstorage'
 import location from 'redux-effects-location'
 import persist from './middleware/persist'
@@ -27,15 +26,7 @@ const middleware = [
 ]
 
 /**
- * Store
- */
-
-function configureStore (initialState) {
-  return applyMiddleware(...middleware)(createStore)(reducer, initialState)
-}
-
-/**
  * Exports
  */
 
-export default configureStore
+export default middleware
