@@ -28,9 +28,8 @@ const initialState = {
 }
 
 function reducer (state, action) {
-  switch (action.type) {
-    case 'INCREMENT':
-      return {...state, counter: state.counter + 1}
+  if (action.type === 'INCREMENT') {
+    return {...state, counter: state.counter + 1}
   }
 
   return state
