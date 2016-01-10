@@ -57,8 +57,8 @@ Put this in your babelrc and `npm install babel-plugin-transform-react-jsx` to m
 
 ```json
 "plugins": [
-    ["transform-react-jsx", {"pragma": "element"}]
-  ]
+  ["transform-react-jsx", {"pragma": "element"}]
+]
 ```
 
 ## DOM Events / Actions
