@@ -17,11 +17,12 @@ const initialState = {
  * App
  */
 
-function boot (vdux) {
+function boot (vdux, vtree) {
   return vdux({
     reducer,
     initialState,
-    app
+    app,
+    vtree
   })
 }
 

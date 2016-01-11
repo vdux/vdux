@@ -9,14 +9,14 @@ import ephemeral from 'redux-ephemeral'
 import empty from '@f/empty-element'
 import local from 'virtex-local'
 import delegant from 'delegant'
-import dom from 'virtex-dom'
+import dom, {reconstitute} from 'virtex-dom'
 import virtex from 'virtex'
 
 /**
  * vdux
  */
 
-function vdux ({middleware = [], reducer, initialState = {}, app, node = document.body}) {
+function vdux ({middleware = [], reducer, initialState = {}, app, node = document.body, vtree}) {
   /**
    * Create redux store
    */
@@ -33,14 +33,21 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
    * Empty the root node
    */
 
-  empty(node)
+  if (!vtree) {
+    empty(node)
+  }
 
   /**
    * Render the VDOM tree
    */
 
-  let tree = render()
-  node.appendChild(create(tree).element)
+  if (vtree) {
+    reconstitute(vtree, node.firstChild)
+    syncNow()
+  } else {
+    vtree = render()
+    node.appendChild(create(vtree).element)
+  }
 
   /**
    * Create the Virtual DOM <-> Redux cycle
@@ -75,8 +82,8 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
     pending = false
 
     const newTree = render()
-    update(tree, newTree)
-    tree = newTree
+    update(vtree, newTree)
+    vtree = newTree
   }
 }
 

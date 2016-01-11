@@ -36,10 +36,11 @@ function vdux ({middleware = [], reducer, initialState = {}, app, ready = () => 
 
     function render () {
       const state = store.getState()
-      const html = create(app(state)).element
+      const vtree = app(state)
+      const html = create(vtree).element
 
       if (ready(state)) {
-        resolve(html)
+        resolve({html, vtree})
         unsub()
       }
     }
