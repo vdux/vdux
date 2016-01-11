@@ -13,7 +13,7 @@ import virtex from 'virtex'
  * vdux
  */
 
-function vdux (middleware, reducer, initialState, app, ready = () => true) {
+function vdux ({middleware = [], reducer, initialState = {}, app, ready = () => true}) {
   /**
    * Create redux store
    */
@@ -25,12 +25,6 @@ function vdux (middleware, reducer, initialState, app, ready = () => true) {
    */
 
   const {create} = virtex(store.dispatch)
-
-  /**
-   * Render the VDOM tree
-   */
-
-  let tree = render()
 
   /**
    * Create the Virtual DOM <-> Redux cycle
