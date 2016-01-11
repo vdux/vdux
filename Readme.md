@@ -328,7 +328,7 @@ Internally, all `ref.to` is doing is using `<Dropdown/>`'s `local` function to s
 
 ## Server-side rendering
 
-...Still working on this section...
+...Still working on this section...but you can check out the super basic universal example if you want to experiment with it.
 
 ## Side-effects
 
