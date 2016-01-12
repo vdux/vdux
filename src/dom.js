@@ -53,8 +53,22 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
    * Create the Virtual DOM <-> Redux cycle
    */
 
-  store.subscribe(sync)
-  delegant(node, action => action && store.dispatch(action))
+  const unsubscribe = store.subscribe(sync)
+  const undelegate = delegant(node, action => action && store.dispatch(action))
+
+  return {
+    replace (_app, _reducer) {
+      app = _app
+      reducer = _reducer
+      store.replaceReducer(reducer)
+      sync()
+    },
+
+    stop () {
+      unsubscribe()
+      undelegate()
+    }
+  }
 
   /**
    * Render a new virtual dom

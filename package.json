@@ -16,7 +16,7 @@
     "redux-ephemeral": "^0.2.0",
     "virtex": "^0.2.1",
     "virtex-component": "^0.1.11",
-    "virtex-dom": "^0.2.2",
+    "virtex-dom": "^0.2.4",
     "virtex-element": "^0.2.2",
     "virtex-local": "^0.2.1",
     "virtex-string": "^0.3.1"
@@ -40,6 +40,7 @@
     "babel-preset-stage-2": "^6.3.13",
     "babel-tape-runner": "^2.0.0",
     "babelify": "^7.2.0",
+    "browserify-hmr": "^0.3.1",
     "enroute": "^1.0.1",
     "koa": "^1.1.2",
     "koa-browserify-middleware": "^1.0.0",

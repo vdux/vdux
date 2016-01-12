@@ -326,6 +326,20 @@ export default {
 
 Internally, all `ref.to` is doing is using `<Dropdown/>`'s `local` function to send it a message in the same way it sends actions to itself.
 
+## Hot module replacement
+
+Since vdux itself is largely stateless, hot module replacement is trivial. All the code you need is:
+
+```javascript
+const {replace} = vdux({reducer, app})
+
+if (module.hot) {
+  module.hot.accept(['./app', './reducer'], () => replace(require('./app'), require('./reducer')))
+}
+```
+
+vdux returns an object containing the `replace` function that allows you to swap out your `app` function and your `reducer`. If you want to swap out something else (like middleware), you should probably reload the page, as it may be stateful. If people want something like this though i'll add it in the future.
+
 ## Server-side rendering
 
 ...Still working on this section...but you can check out the super basic universal example if you want to experiment with it.
