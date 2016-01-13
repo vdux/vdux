@@ -60,7 +60,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
     replace (_app, _reducer) {
       app = _app
       reducer = _reducer
-      store.replaceReducer(reducer)
+      store.replaceReducer(ephemeral('ui', reducer))
       sync()
     },
 
