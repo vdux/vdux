@@ -2,22 +2,18 @@
  * Imports
  */
 
-import {raf} from 'redux-effects-timeout'
 import element from '../../element'
-
+import animate from './animate'
 
 /**
  * Style
  */
 
-const width = 50
-const height = 50
+const maxSize = 200
 const defaultStyle = {
   position: 'absolute',
   borderRadius: '50%',
   backgroundColor: 'red',
-  width,
-  height,
   overflow: 'hidden',
   opacity: 0.2
 }
@@ -27,50 +23,35 @@ const defaultStyle = {
  */
 
 function afterMount ({path, props}) {
-  let t = 0
-  return raf(function animator () {
-    const styles = ripple(t++, props.x, props.y)
-
-    if (t < width) {
-      applyStyles(document.getElementById(path), styles)
-      return raf(animator)
-    } else {
-      return props.onEnd()
-    }
-  })
+  return animate(circle, circleDone, () => document.getElementById(path), props)
 }
 
 function render ({props, path}) {
   const {x, y} = props
-  return <div id={path} style={{...defaultStyle, ...center(x, y)}}></div>
+  return <div id={path} style={defaultStyle}></div>
 }
 
 /**
  * Animation
  */
 
-function center (t, x, y) {
-  return {
-    left: x - (t / 2),
-    top: y - (t / 2)
-  }
-}
-
-function ripple (t, x, y) {
-  const size = t * 4
+function circle (t, {x, y}) {
+  const size = getSize(t)
 
   return {
+    left: x - (size / 2),
+    top: y - (size / 2),
     width: size,
-    height: size,
-    ...center(size, x, y)
+    height: size
   }
 }
 
-function applyStyles (node, styles = {}) {
-  for (let key in styles) {
-    const val = styles[key]
-    node.style[key] = val
-  }
+function circleDone (t) {
+  return getSize(t) >= maxSize
+}
+
+function getSize (t) {
+  return t * 5
 }
 
 /**
