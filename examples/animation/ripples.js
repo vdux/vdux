@@ -17,7 +17,8 @@ const defaultStyle = {
   top: 0,
   left: 0,
   overflow: 'hidden',
-  position: 'absolute'
+  position: 'absolute',
+  pointerEvents: 'none'
 }
 
 /**
