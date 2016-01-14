@@ -6,10 +6,10 @@ import {fetchPosts} from '../actions'
 import element from '../../../element'
 
 /**
- * Before mount
+ * onCreate
  */
 
-function beforeMount () {
+function onCreate () {
   return fetchPosts()
 }
 
@@ -39,6 +39,6 @@ function render ({props}) {
  */
 
 export default {
-  beforeMount,
+  onCreate,
   render
 }

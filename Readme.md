@@ -226,11 +226,9 @@ Where `prev` is the previous model and `next` is the next model.
 
 ### Hooks
 
-  * `beforeMount(model)` - Called before the component is rendered in the DOM for the first time. Called only once.
-  * `beforeUpdate(prev, next)` - Called before a change to the component's model (not including the initial render).
-  * `beforeRender(model)` - Called right before any render (including the initial render).
-  * `afterUpdate(prev, next)` - Called after a change to the component's model (not including the initial render).
-  * `afterMount(model)` - Called after the component is first rendered into the DOM. Called only once.
+  * `onCreate` - When the component is created. Receives `model`.
+  * `onUpdate` - When the model changes. Receives `prev` and `next` models.
+  * `onRemove` - When the component is removed. Receives `model`.
 
 ## Local state
 

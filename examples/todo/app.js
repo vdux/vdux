@@ -12,10 +12,10 @@ import element from '../../element'
 import Todo from './components/todo'
 
 /**
- * beforeMount
+ * onCreate
  */
 
-function beforeMount () {
+function onCreate () {
   return initializeApp()
 }
 
@@ -112,7 +112,7 @@ const reducer = combineReducers({
  */
 
 export default {
-  beforeMount,
+  onCreate,
   initialState,
   render,
   reducer

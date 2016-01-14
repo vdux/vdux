@@ -7,10 +7,10 @@ import element from '../../element'
 import router from './router'
 
 /**
- * Before mount
+ * onCreate
  */
 
-function beforeMount () {
+function onCreate () {
   return initializeApp()
 }
 
@@ -27,6 +27,6 @@ function render ({props}) {
  */
 
 export default {
-  beforeMount,
+  onCreate,
   render
 }

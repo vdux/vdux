@@ -8,18 +8,18 @@ import Posts from './components/posts'
 import element from '../../element'
 
 /**
- * beforeMount
+ * onCreate
  */
 
-function beforeMount ({props}) {
+function onCreate ({props}) {
   return requestPosts(props.reddit)
 }
 
 /**
- * beforeUpdate
+ * onUpdate
  */
 
-function beforeUpdate (prev, next) {
+function onUpdate (prev, next) {
   if (prev.props.reddit !== next.props.reddit) {
     return requestPosts(next.props.reddit)
   }
@@ -56,7 +56,7 @@ function render ({props}) {
  */
 
 export default {
-  beforeMount,
-  beforeUpdate,
+  onCreate,
+  onUpdate,
   render
 }

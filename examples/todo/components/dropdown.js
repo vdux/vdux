@@ -20,10 +20,10 @@ function initialState () {
 }
 
 /**
- * beforeUpdate
+ * onUpdate
  */
 
-function beforeUpdate (prev, next) {
+function onUpdate (prev, next) {
   if (!prev.state.open && next.state.open) {
     return bindCloseHandler(next.local)
   } else if(prev.state.open && !next.state.open) {
@@ -91,7 +91,7 @@ function unbindCloseHandler (local, id) {
 
 export default {
   initialState,
-  beforeUpdate,
+  onUpdate,
   render,
   reducer,
   toggle

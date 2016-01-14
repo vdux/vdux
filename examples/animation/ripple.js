@@ -22,7 +22,7 @@ const defaultStyle = {
  * Ripple
  */
 
-function afterMount ({path, props}) {
+function onCreate ({path, props}) {
   return animate(circle, circleDone, () => document.getElementById(path), props)
 }
 
@@ -59,6 +59,6 @@ function getSize (t) {
  */
 
 export default {
-  afterMount,
+  onCreate,
   render
 }
