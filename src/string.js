@@ -40,7 +40,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, ready = () => 
       const html = create(vtree).element
 
       if (ready(state)) {
-        resolve({html, vtree})
+        resolve({html, vtree, state})
         unsub()
       }
     }
