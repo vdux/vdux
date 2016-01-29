@@ -15,7 +15,7 @@ const middleware = [
   multi,
   effects,
   timeout(),
-  logger()
+  // logger({predicate: (getState, {meta}) => !meta || !meta.nolog})
 ]
 
 /**

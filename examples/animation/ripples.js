@@ -14,8 +14,8 @@ import uid from 'get-uid'
 const defaultStyle = {
   height: '100%',
   width: '100%',
-  top: 0,
-  left: 0,
+  top: '0px',
+  left: '0px',
   overflow: 'hidden',
   position: 'absolute',
   pointerEvents: 'none'

@@ -25,7 +25,8 @@ domready(() => vdux({
   middleware,
   reducer,
   initialState,
-  app
+  app,
+  node: document.getElementById('app')
 }))
 
 /**

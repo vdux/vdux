@@ -4,12 +4,11 @@
 
 import applyMiddleware from 'redux/lib/applyMiddleware'
 import createStore from 'redux/lib/createStore'
-import component from 'virtex-component'
-import ephemeral from 'redux-ephemeral'
-import empty from '@f/empty-element'
-import local from 'virtex-local'
-import delegant from 'delegant'
 import dom, {reconstitute} from 'virtex-dom'
+import local, {mount} from 'virtex-local'
+import component from 'virtex-component'
+import empty from '@f/empty-element'
+import delegant from 'delegant'
 import virtex from 'virtex'
 
 /**
@@ -21,13 +20,15 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
    * Create redux store
    */
 
-  const store = applyMiddleware(dom, local('ui'), component, ...middleware)(createStore)(ephemeral('ui', reducer), initialState)
+  const dirty = {}
+  const components = {}
+  const store = applyMiddleware(dom, local('ui', dirty), component(components), ...middleware)(createStore)(mount('ui', reducer), initialState)
 
   /**
    * Initialize virtex
    */
 
-  const {create, update} = virtex(store.dispatch)
+  const {create, update, updatePaths} = virtex(store.dispatch)
 
   /**
    * Empty the root node
@@ -60,7 +61,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
     replace (_app, _reducer) {
       app = _app
       reducer = _reducer
-      store.replaceReducer(ephemeral('ui', reducer))
+      store.replaceReducer(mount('ui', reducer))
       sync()
     },
 
@@ -96,8 +97,30 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
     pending = false
 
     const newTree = render()
+
     update(vtree, newTree)
+    updateDirty()
+
     vtree = newTree
+  }
+
+  function updateDirty () {
+    Object
+      .keys(dirty)
+      // Sort by shortest dirty paths first, so that if possible
+      // we get some of the higher re-renders cleaning up some
+      // of the lower ones
+      .sort((a, b) => a.length - b.length)
+      .forEach(path => {
+        // Check that it's still dirty, since the re-rendering of a higher component
+        // may cause one of the lower ones to get re-rendered
+        if (dirty[path]) {
+          const component = components[path]
+          const prev = {...component}
+          component.vnode = null
+          update(prev, component, path)
+        }
+      })
   }
 }
 

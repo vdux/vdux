@@ -3,7 +3,7 @@
  */
 
 import element from '../../element'
-import animate from './animate'
+import Tick from './tick'
 
 /**
  * Style
@@ -22,13 +22,12 @@ const defaultStyle = {
  * Ripple
  */
 
-function onCreate ({path, props}) {
-  return animate(circle, circleDone, () => document.getElementById(path), props)
-}
-
 function render ({props, path}) {
-  const {x, y} = props
-  return <div id={path} style={defaultStyle}></div>
+  return (
+    <Tick done={circleDone} onEnd={props.onEnd}>
+      {t => <div style={circle(t, props)}></div>}
+    </Tick>
+  )
 }
 
 /**
@@ -39,10 +38,11 @@ function circle (t, {x, y}) {
   const size = getSize(t)
 
   return {
-    left: x - (size / 2),
-    top: y - (size / 2),
-    width: size,
-    height: size
+    ...defaultStyle,
+    left: x - (size / 2) + 'px',
+    top: y - (size / 2) + 'px',
+    width: size + 'px',
+    height: size + 'px'
   }
 }
 
@@ -59,6 +59,5 @@ function getSize (t) {
  */
 
 export default {
-  onCreate,
   render
 }
