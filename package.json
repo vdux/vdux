@@ -15,7 +15,7 @@
     "redux": "^3.1.2",
     "virtex": "^0.3.1",
     "virtex-component": "^0.3.1",
-    "virtex-dom": "^0.3.0",
+    "virtex-dom": "^0.3.1",
     "virtex-element": "^0.3.0",
     "virtex-local": "^0.3.6",
     "virtex-string": "^0.3.2"
