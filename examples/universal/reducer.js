@@ -6,7 +6,7 @@ function reducer (state, action) {
   if (action.type === 'INCREMENT') {
     return {
       ...state,
-      counter: state.counter + 1
+      counter: Number(state.counter) + 1
     }
   }
 

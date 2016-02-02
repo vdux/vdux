@@ -13,12 +13,12 @@
     "@f/empty-element": "^1.0.0",
     "delegant": "^0.1.8",
     "redux": "^3.1.2",
-    "virtex": "^0.3.1",
+    "virtex": "^0.3.2",
     "virtex-component": "^0.3.1",
-    "virtex-dom": "^0.3.1",
+    "virtex-dom": "^0.3.2",
     "virtex-element": "^0.3.0",
     "virtex-local": "^0.3.6",
-    "virtex-string": "^0.3.2"
+    "virtex-string": "^0.3.3"
   },
   "devDependencies": {
     "@f/combine-reducers": "^1.0.3",

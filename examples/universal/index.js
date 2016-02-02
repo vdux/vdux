@@ -10,4 +10,8 @@ import boot from './main'
  * Initialize
  */
 
-domready(() => boot(vdux, window.__getInitialVTree__()))
+domready(() => boot(
+  vdux,
+  window.__initialState__,
+  true
+))

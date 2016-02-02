@@ -2,14 +2,21 @@
  * Imports
  */
 
-import h from '../../element'
+import element from '../../element'
 
 /**
  * App
  */
 
-function app (state) {
-  return h('div', {onClick: increment}, ['Counter: ' + state.counter])
+function app ({props}) {
+  return (
+    <div>
+      <div onClick={increment}>Counter: {props.counter}</div>
+      <p>
+        <i>Append ?counter=&lt;n&gt; to the url to see the server-side rendering in action</i>
+      </p>
+    </div>
+  )
 }
 
 function increment () {

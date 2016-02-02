@@ -2,27 +2,20 @@
  * Imports
  */
 
+import element from '../../element'
 import reducer from './reducer'
-import app from './app'
-
-/**
- * initialState
- */
-
-const initialState = {
-  counter: 0
-}
+import App from './app'
 
 /**
  * App
  */
 
-function boot (vdux, vtree) {
+function boot (vdux, initialState, prerendered) {
   return vdux({
     reducer,
     initialState,
-    app,
-    vtree
+    app: state => <App {...state} />,
+    prerendered
   })
 }
 

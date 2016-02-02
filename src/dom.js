@@ -15,11 +15,12 @@ import virtex from 'virtex'
  * vdux
  */
 
-function vdux ({middleware = [], reducer, initialState = {}, app, node = document.body, vtree}) {
+function vdux ({middleware = [], reducer, initialState = {}, app, node = document.body, prerendered}) {
   /**
    * Create redux store
    */
 
+  let vtree
   const dirty = {}
   const components = {}
   const store = applyMiddleware(dom, local('ui', dirty), component(components), ...middleware)(createStore)(mount('ui', reducer), initialState)
@@ -34,7 +35,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
    * Empty the root node
    */
 
-  if (!vtree) {
+  if (!prerendered) {
     empty(node)
   }
 
@@ -42,13 +43,10 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
    * Render the VDOM tree
    */
 
-  if (vtree) {
-    reconstitute(vtree, node.firstChild)
-    syncNow()
-  } else {
-    vtree = render()
-    node.appendChild(create(vtree).element)
-  }
+  vtree = render()
+  prerendered
+    ? create(vtree, '0', node.firstChild)
+    : node.appendChild(create(vtree).element)
 
   /**
    * Create the Virtual DOM <-> Redux cycle
