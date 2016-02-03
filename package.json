@@ -13,7 +13,7 @@
     "@f/empty-element": "^1.0.0",
     "delegant": "^0.1.8",
     "redux": "^3.1.2",
-    "virtex": "^0.3.2",
+    "virtex": "^0.3.3",
     "virtex-component": "^0.3.1",
     "virtex-dom": "^0.3.2",
     "virtex-element": "^0.3.0",
