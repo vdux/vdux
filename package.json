@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@f/empty-element": "^1.0.0",
+    "@f/event-handler": "^1.0.1",
     "delegant": "^0.1.8",
+    "ev-store": "^7.0.0",
     "redux": "^3.1.2",
     "virtex": "^0.3.4",
     "virtex-component": "^0.3.1",

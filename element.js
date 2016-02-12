@@ -3,4 +3,4 @@
  * require('vdux/element')
  */
 
-module.exports = require('virtex-element')
+exports = module.exports = require('virtex-element')

@@ -8,7 +8,7 @@ import dom, {reconstitute} from 'virtex-dom'
 import local, {mount} from 'virtex-local'
 import component from 'virtex-component'
 import empty from '@f/empty-element'
-import delegant from 'delegant'
+import delegant, {delegateGlobal} from 'delegant'
 import virtex from 'virtex'
 
 /**
@@ -53,7 +53,8 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
    */
 
   const unsubscribe = store.subscribe(sync)
-  const undelegate = delegant(node, action => action && store.dispatch(action))
+  const undelegate = delegant(document, maybeDispatch)
+  const undelegateGlobal = delegateGlobal(window, maybeDispatch)
 
   return {
     replace (_app, _reducer) {
@@ -66,7 +67,12 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
     stop () {
       unsubscribe()
       undelegate()
+      undelegateGlobal()
     }
+  }
+
+  function maybeDispatch (action) {
+    return action && store.dispatch(action)
   }
 
   /**
