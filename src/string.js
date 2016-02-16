@@ -23,20 +23,20 @@ function vdux ({middleware = [], reducer, initialState = {}, app, ready = () => 
    * Initialize virtex
    */
 
-  const {create} = virtex(store.dispatch)
+  const {create, update} = virtex(store.dispatch)
 
   /**
    * Create the Virtual DOM <-> Redux cycle
    */
 
   return new Promise((resolve, reject) => {
-    render()
-    const unsub = store.subscribe(render)
+    run()
+    const unsub = store.subscribe(run)
 
-    function render () {
+    function run () {
       const state = store.getState()
       const vtree = app(state)
-      const html = create(vtree).element
+      const html = render(vtree)
 
       if (ready(state)) {
         resolve({html, vtree, state})
@@ -44,6 +44,13 @@ function vdux ({middleware = [], reducer, initialState = {}, app, ready = () => 
       }
     }
   })
+
+  let prev
+  function render (vtree) {
+    const result = (prev ? update(prev, vtree) : create(vtree)).element
+    prev = vtree
+    return result
+  }
 }
 
 /**
