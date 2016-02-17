@@ -31,16 +31,20 @@ function vdux ({middleware = [], reducer, initialState = {}, app, ready = () => 
 
   return new Promise((resolve, reject) => {
     run()
-    const unsub = store.subscribe(run)
+    const unsub = store.subscribe(() => setTimeout(run))
 
     function run () {
-      const state = store.getState()
-      const vtree = app(state)
-      const html = render(vtree)
+      try {
+        const state = store.getState()
+        const vtree = app(state)
+        const html = render(vtree)
 
-      if (ready(state)) {
-        resolve({html, vtree, state})
-        unsub()
+        if (ready(state)) {
+          resolve({html, vtree, state})
+          unsub()
+        }
+      } catch (e) {
+        reject(e)
       }
     }
   })
