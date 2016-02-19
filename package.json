@@ -19,7 +19,7 @@
     "virtex-component": "^0.3.1",
     "virtex-dom": "^0.3.2",
     "virtex-element": "^0.3.0",
-    "virtex-local": "^0.3.6",
+    "virtex-local": "^0.4.0",
     "virtex-string": "^0.3.4"
   },
   "devDependencies": {

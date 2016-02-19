@@ -209,7 +209,6 @@ Components in vdux look a lot like components in other virtual dom libraries. Yo
   * `children` - The child elements of your component
   * `state` - The state of your component
   * `local` - Directs an action to the current component's reducer (see the local state section)
-  * `ref` - Direct an action to another component's reducer (see the local state section)
   * `path` - The dotted path to your component in the DOM tree. For the most part, you probably don't need to worry about this.
 
 ### shouldUpdate
@@ -274,55 +273,100 @@ export default {
 }
 ```
 
-### ref
+### refs
 
-Ref is how you talk to other components in a functional way. It has two functions on it
-
-  * `as(name)` - Creates an aliased reference to a child component.
-  * `to(name, fn)` - Directs an action (returned by `fn`) to the component aliased as `name`.
-
-Here's an example:
+In React, refs let you call functions on other components. vdux does not have a native way of accomplishing this. In vdux, this is considered something of an anti-pattern, and should be avoided as much as possible. However, if you do need to do it, the convention is to use a `ref` prop to expose your component's API, like this:
 
 ```javascript
 import Dropdown from 'components/dropdown'
 
-function render ({ref}) {
+function render () {
+  let open
+
   return (
-    <button onClick={ref.to('dropdown', Dropdown.open)}>Open Dropdown</button>
-    <Dropdown ref={ref.as('dropdown')}>
+    <button onClick={e => open()}>Open Dropdown</button>
+    <Dropdown ref={_open => open = _open}>
       <li>item</li>
     </Dropdown>
   )
 }
 ```
 
-In dropdown.js you'd just export a plain `open` action creator function, like this:
+In dropdown.js you'd then do:
 
 ```javascript
+function render ({props, local}) {
+  if (props.ref) props.ref(local(open))
+
+  return (
+    // Render the dropdown, etc...
+  )
+}
+
+
 function open () {
   return {
     type: 'OPEN'
   }
 }
+```
 
-function reducer (state, action) {
-  if (action.type === 'OPEN') {
-    return {
-      ...state,
-      open: true
-    }
-  }
+## Global event handlers
 
-  return state
-}
+Sometimes you want to listen to events on the window or the document in your components. For instance, to close a dropdown on an external click. This can be awkward and error prone, because you have to store a reference to the handler, and then keep it in sync with the life-cycle of your component. To address this vdux exports some special components to make this nice for you, `Window`, `Document` and `Body`, that allow you to bind event handlers to each of these elements in the exact same way you bind to any other events.
 
-export default {
-  open,
-  reducer
+### Example - Closing a dropdown on an external click
+
+```javascript
+import Document from 'vdux/document'
+
+function render ({local, children}) {
+  return (
+    <Document onClick={local(close)}>
+      <div class='dropdown'>
+        {children}
+      </div>
+    </Document>
+  )
 }
 ```
 
-Internally, all `ref.to` is doing is using `<Dropdown/>`'s `local` function to send it a message in the same way it sends actions to itself.
+### Example - Router
+
+```javascript
+import Window from 'vdux/window'
+import Document from 'vdux/document'
+import HomePage from 'pages/home'
+import enroute from 'enroute'
+
+const router = enroute({
+  '/': () => <HomePage />
+})
+
+function render ({local, state}) {
+  return (
+    <Window onPopstate={local(setUrl)}>
+      <Document onClick={handleLinkClicks(local(setUrl))}>
+        {
+          router(state.url)
+        }
+      </Document
+    </Window>
+  )
+}
+
+function handleLinkClicks (setUrl) {
+  return e => {
+    if (e.target.nodeName === 'A') {
+      const href = e.getAttribute('href')
+      if (isLocal(href)) {
+        e.preventDefault()
+        return setUrl(href)
+      }
+    }
+  }
+}
+```
 
 ## Hot module replacement
 

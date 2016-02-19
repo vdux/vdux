@@ -23,7 +23,7 @@ function initialState () {
  * Render
  */
 
-function render ({state, props, local, ref}) {
+function render ({state, props, local}) {
   const {text, important, completed, idx} = props
   const {editing, editText} = state
   const edit = local(beginEdit, text)
@@ -32,14 +32,16 @@ function render ({state, props, local, ref}) {
     ? [setTodoText(idx, editText), cancel]
     : removeTodo(idx)
 
+  let toggle
+
   return (
     <li class={{completed, important, editing}}>
       <div class='view' onDblclick={edit}>
         <input class='toggle' type='checkbox' onChange={setCompleted(idx, !completed)} checked={completed} />
         <label style={{color: important ? 'red' : 'black'}}>
           {text}
-          <img class='options' src='css/options.png' onClick={ref.to('dropdown', Dropdown.toggle)} />
-          <Dropdown ref={ref.as('dropdown')}>
+          <img class='options' src='css/options.png' onClick={e => toggle()} />
+          <Dropdown ref={_toggle => toggle = _toggle}>
             <div onClick={setImportant(idx, !important)}>Important</div>
             <div onClick={removeTodo(idx)}>Remove</div>
           </Dropdown>
