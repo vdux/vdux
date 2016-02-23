@@ -3,12 +3,13 @@
  */
 
 import applyMiddleware from 'redux/lib/applyMiddleware'
+import delegant, {delegateGlobal} from 'delegant'
 import createStore from 'redux/lib/createStore'
 import dom, {reconstitute} from 'virtex-dom'
 import local, {mount} from 'virtex-local'
 import component from 'virtex-component'
 import empty from '@f/empty-element'
-import delegant, {delegateGlobal} from 'delegant'
+import thunk from 'redux-thunk'
 import virtex from 'virtex'
 
 /**
@@ -23,7 +24,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
   let vtree
   const dirty = {}
   const components = {}
-  const store = applyMiddleware(dom, local('ui', dirty), component(components), ...middleware)(createStore)(mount('ui', reducer), initialState)
+  const store = applyMiddleware(dom, local('ui', dirty), component(components), thunk, ...middleware)(createStore)(mount('ui', reducer), initialState)
 
   /**
    * Initialize virtex
