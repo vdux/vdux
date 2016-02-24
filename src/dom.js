@@ -9,6 +9,8 @@ import dom, {reconstitute} from 'virtex-dom'
 import local, {mount} from 'virtex-local'
 import component from 'virtex-component'
 import empty from '@f/empty-element'
+import multi from 'redux-multi'
+import falsy from 'redux-falsy'
 import thunk from 'redux-thunk'
 import virtex from 'virtex'
 
@@ -24,7 +26,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
   let vtree
   const dirty = {}
   const components = {}
-  const store = applyMiddleware(dom, local('ui', dirty), component(components), thunk, ...middleware)(createStore)(mount('ui', reducer), initialState)
+  const store = applyMiddleware(falsy, multi, dom, local('ui', dirty), component(components), thunk, ...middleware)(createStore)(mount('ui', reducer), initialState)
 
   /**
    * Initialize virtex

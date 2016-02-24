@@ -6,6 +6,8 @@ import {createStore, applyMiddleware} from 'redux'
 import local, {mount} from 'virtex-local'
 import component from 'virtex-component'
 import string from 'virtex-string'
+import multi from 'redux-multi'
+import falsy from 'redux-falsy'
 import virtex from 'virtex'
 
 /**
@@ -17,7 +19,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, ready = () => 
    * Create redux store
    */
 
-  const store = applyMiddleware(string, local('ui'), component(), ...middleware)(createStore)(mount('ui', reducer), initialState)
+  const store = applyMiddleware(falsy, multi, string, local('ui'), component(), ...middleware)(createStore)(mount('ui', reducer), initialState)
 
   /**
    * Initialize virtex

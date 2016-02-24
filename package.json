@@ -15,6 +15,8 @@
     "delegant": "^0.1.10",
     "ev-store": "^7.0.0",
     "redux": "^3.1.2",
+    "redux-falsy": "^1.0.0",
+    "redux-multi": "^0.1.12",
     "redux-thunk": "^1.0.3",
     "virtex": "^0.3.5",
     "virtex-component": "^0.3.1",
