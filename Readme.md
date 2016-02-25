@@ -139,7 +139,7 @@ Also of note, vdux is unopinionated about the casing of event handler prop names
 
 The JSX pragma `element` comes with a bit of syntactic sugar to make your life easier out of the box. If you don't like its opinions or don't use its features and don't want them bloating your bundle, you can write your own on top of the `element` exported by [virtex](https://github.com/ashaffer/virtex) and use that instead.
 
-### events
+### Events
 
 If you want to do more than one thing in response to an event, you can pass an array of handlers, like this:
 
@@ -274,7 +274,7 @@ export default {
 }
 ```
 
-### refs
+### Refs
 
 In React, refs let you call functions on other components. vdux does not have a native way of accomplishing this. In vdux, this is considered something of an anti-pattern, and should be avoided as much as possible. However, if you do need to do it, the convention is to use a `ref` prop to expose your component's API, like this:
 
@@ -394,10 +394,6 @@ Almost side-effect free, anyway. You still need to do things like issue requests
   * [redux-effects](https://github.com/redux-effects/redux-effects)
   * [redux-thunk](https://github.com/gaearon/redux-thunk)
   * [redux-promise](https://github.com/acdlite/redux-promise)
-
-## Suggested middleware
-
-  * [redux-multi](https://github.com/ashaffer/redux-multi) - Highly recommended, without this, you'll only be able to return one action at a time, which is severely limiting. Use this to return arrays of actions to be dispatched.
 
 ## Submodules / Ecosystem
 
