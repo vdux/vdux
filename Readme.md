@@ -227,6 +227,7 @@ Where `prev` is the previous model and `next` is the next model.
 
   * `onCreate` - When the component is created. Receives `model`.
   * `onUpdate` - When the model changes. Receives `prev` and `next` models.
+  * `afterRender` - Called after any render. Passed the model and the root DOM node of the component. Runs only in the browser. It is recommended that you avoid using it as much as possible - but it is necessary in a few cases like positioning elements relative to one another.
   * `onRemove` - When the component is removed. Receives `model`.
 
 ## Local state
