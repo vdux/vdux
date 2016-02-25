@@ -85,7 +85,7 @@ export default function render () {
 
 ### babelrc
 
-Put this in your babelrc and `npm install babel-plugin-transform-react-jsx` to make JSX work with `element`.
+Put this in your `.babelrc` and `npm install babel-plugin-transform-react-jsx` to make JSX work with vdux's `element` creator.
 
 ```json
 "plugins": [
