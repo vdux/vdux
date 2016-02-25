@@ -61,6 +61,9 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
     ? create(vtree, '0', node.firstChild)
     : node.appendChild(create(vtree).element)
 
+  // Run any pending afterRender lifecycle hooks
+  postRenderQueue.flush()
+
   /**
    * Create the Virtual DOM <-> Redux cycle
    */
