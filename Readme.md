@@ -416,8 +416,8 @@ If you want to try something more advanced, you can create your own vdux by comp
 
 Take a look at the org [vdux-components](https://github.com/vdux-components) for more.
 
-  * [delay](https://github.com/vdux-components/delay) - Declarative delay component for vdux 
-  * [hover](https://github.com/vdux-components/hover) - Hover component for vdux
+  * [delay](https://github.com/vdux-components/delay) - Delay the rendering of child components, or execution of an action for a declaratively specified period.
+  * [hover](https://github.com/vdux-components/hover) - Hover component
 
 ## License
 
