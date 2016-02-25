@@ -395,7 +395,9 @@ Almost side-effect free, anyway. You still need to do things like issue requests
   * [redux-thunk](https://github.com/gaearon/redux-thunk)
   * [redux-promise](https://github.com/acdlite/redux-promise)
 
-## Submodules / Ecosystem
+## Ecosystem
+
+### Internal submodules
 
 vdux itself is very small. It is primarily composed of other, smaller modules:
 
@@ -409,6 +411,13 @@ vdux itself is very small. It is primarily composed of other, smaller modules:
   * [redux-ephemeral](https://github.com/ashaffer/redux-ephemeral) - Allows your reducer to manage transient local state (i.e. component local state).
 
 If you want to try something more advanced, you can create your own vdux by composing these modules and inserting others in your own way.
+
+### Components
+
+Take a look at the org [vdux-components](https://github.com/vdux-components) for more.
+
+  * [delay](https://github.com/vdux-components/delay) - Declarative delay component for vdux 
+  * [hover](https://github.com/vdux-components/hover) - Hover component for vdux
 
 ## License
 
