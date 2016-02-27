@@ -23,7 +23,7 @@
     "virtex-component": "^0.3.3",
     "virtex-dom": "^0.3.5",
     "virtex-element": "^0.3.2",
-    "virtex-local": "^0.4.0",
+    "virtex-local": "^0.4.1",
     "virtex-string": "^0.3.5"
   },
   "devDependencies": {
