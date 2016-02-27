@@ -137,9 +137,11 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
         // may cause one of the lower ones to get re-rendered
         if (dirty[path]) {
           const component = components[path]
-          const prev = {...component}
-          component.vnode = null
-          update(prev, component, path)
+          if (component) {
+            const prev = {...component}
+            component.vnode = null
+            update(prev, component, path)
+          }
         }
       })
   }
