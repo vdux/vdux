@@ -53,6 +53,14 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
   }
 
   /**
+   * Create the Virtual DOM <-> Redux cycle
+   */
+
+  const unsubscribe = store.subscribe(sync)
+  const undelegate = delegant(document, maybeDispatch)
+  const undelegateGlobal = delegateGlobal(window, maybeDispatch)
+
+  /**
    * Render the VDOM tree
    */
 
@@ -63,14 +71,6 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
 
   // Run any pending afterRender lifecycle hooks
   postRenderQueue.flush()
-
-  /**
-   * Create the Virtual DOM <-> Redux cycle
-   */
-
-  const unsubscribe = store.subscribe(sync)
-  const undelegate = delegant(document, maybeDispatch)
-  const undelegateGlobal = delegateGlobal(window, maybeDispatch)
 
   return {
     replace (_app, _reducer) {
