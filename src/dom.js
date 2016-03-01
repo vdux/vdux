@@ -80,6 +80,10 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
       sync()
     },
 
+    dispatch (action) {
+      store.dispatch(action)
+    },
+
     stop () {
       unsubscribe()
       undelegate()
