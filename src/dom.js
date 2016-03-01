@@ -9,11 +9,14 @@ import dom, {reconstitute} from 'virtex-dom'
 import local, {mount} from 'virtex-local'
 import component from 'virtex-component'
 import empty from '@f/empty-element'
+import isObject from '@f/is-object'
 import createQueue from '@f/queue'
+import forEach from '@f/foreach'
 import multi from 'redux-multi'
 import falsy from 'redux-falsy'
 import thunk from 'redux-thunk'
 import virtex from 'virtex'
+import map from '@f/map'
 
 /**
  * vdux
@@ -130,24 +133,35 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
   }
 
   function updateDirty () {
-    Object
-      .keys(dirty)
+    forEach(path => {
+      // Check that it's still dirty, since the re-rendering of a higher component
+      // may cause one of the lower ones to get re-rendered
+      if (dirty[path]) {
+        const component = components[path]
+
+        if (component) {
+          const prev = {...component}
+
+          // Clear cached vnodes/elements
+          component.vnode = null
+          component.children = map(child => {
+            if (isObject(child)) {
+              child = {...child}
+              if (child.element) child.element = null
+              if (child.vnode) child.vnode = null
+            }
+
+            return child
+          }, component.children)
+
+          update(prev, component, path)
+        }
+      }
+
       // Sort by shortest dirty paths first, so that if possible
       // we get some of the higher re-renders cleaning up some
       // of the lower ones
-      .sort((a, b) => a.length - b.length)
-      .forEach(path => {
-        // Check that it's still dirty, since the re-rendering of a higher component
-        // may cause one of the lower ones to get re-rendered
-        if (dirty[path]) {
-          const component = components[path]
-          if (component) {
-            const prev = {...component}
-            component.vnode = null
-            update(prev, component, path)
-          }
-        }
-      })
+    }, Object.keys(dirty).sort((a, b) => a.length - b.length))
   }
 }
 

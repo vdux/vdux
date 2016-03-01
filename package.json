@@ -12,6 +12,9 @@
   "dependencies": {
     "@f/empty-element": "^1.0.0",
     "@f/event-handler": "^1.0.1",
+    "@f/foreach": "^1.2.2",
+    "@f/is-object": "^1.1.4",
+    "@f/map": "^1.5.3",
     "@f/queue": "^1.0.0",
     "delegant": "^0.1.10",
     "ev-store": "^7.0.0",
