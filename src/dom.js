@@ -66,7 +66,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
 
   vtree = render()
   prerendered
-    ? create(vtree, '0', node.firstChild)
+    ? create(vtree, 'a', node.firstChild)
     : node.appendChild(create(vtree).element)
 
   // Run any pending afterRender lifecycle hooks
