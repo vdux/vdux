@@ -144,16 +144,6 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
 
           // Clear cached vnodes/elements
           component.vnode = null
-          component.children = map(child => {
-            if (isObject(child)) {
-              child = {...child}
-              if (child.element) child.element = null
-              if (child.vnode) child.vnode = null
-            }
-
-            return child
-          }, component.children)
-
           update(prev, component, path)
         }
       }
