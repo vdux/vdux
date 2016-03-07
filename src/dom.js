@@ -28,6 +28,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
    */
 
   let vtree
+  let forceUpdate = false
   const dirty = {}
   const components = {}
   const postRenderQueue = createQueue()
@@ -36,7 +37,13 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
     multi,
     dom,
     local('ui', dirty),
-    component(components, postRenderQueue.add),
+    component({
+      components,
+      postRender: postRenderQueue.add,
+      ignoreShouldUpdate () {
+        return forceUpdate
+      }
+    }),
     thunk,
     ...middleware
   )(createStore)(mount('ui', reducer), initialState)
@@ -80,7 +87,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
       app = _app
       reducer = _reducer
       store.replaceReducer(mount('ui', reducer))
-      sync()
+      syncNow(true)
     },
 
     dispatch (action) {
@@ -120,8 +127,9 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
     setTimeout(syncNow)
   }
 
-  function syncNow () {
+  function syncNow (_forceUpdate) {
     pending = false
+    forceUpdate = _forceUpdate
 
     const newTree = render()
 
@@ -129,6 +137,7 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
     updateDirty()
     postRenderQueue.flush()
 
+    forceUpdate = false
     vtree = newTree
   }
 
