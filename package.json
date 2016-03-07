@@ -23,10 +23,10 @@
     "redux-multi": "^0.1.12",
     "redux-thunk": "^1.0.3",
     "virtex": "^0.3.8",
-    "virtex-component": "^0.4.0",
+    "virtex-component": "^0.4.1",
     "virtex-dom": "^0.3.5",
     "virtex-element": "^0.3.2",
-    "virtex-local": "^0.4.6",
+    "virtex-local": "^0.4.7",
     "virtex-string": "^0.3.5"
   },
   "devDependencies": {
