@@ -9,11 +9,13 @@ import Ripples from './ripples'
  * Button
  */
 
-function render ({props, children, ref}) {
+function render ({props, children}) {
+  let addRipple
+
   return (
-    <button {...props} onClick={[props.onClick, ref.to('ripple', Ripples.addRipple)]}>
+    <button {...props} onClick={[props.onClick, e => addRipple(e)]}>
       {children}
-      <Ripples ref={ref.as('ripple')} />
+      <Ripples ref={_addRipple => addRipple = _addRipple} />
     </button>
   )
 }

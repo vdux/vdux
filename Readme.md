@@ -36,11 +36,13 @@ function reducer (state, action) {
   return state
 }
 
-ready(() => vdux({
-  reducer,
-  initialState,
-  app: state => <Counter value={state.counter} />
-}))
+const {subscribe, render} = vdux({reducer, initialState})
+
+ready(() => {
+  subscribe(state => {
+    render(<Counter value={state.counter} />)
+  })
+})
 
 /**
  * App
@@ -61,15 +63,31 @@ function increment () {
 
 ## Usage
 
-vdux is an opionated, higher-level abstraction over [redux](https://github.com/rackt/redux) and [virtex](https://github.com/ashaffer/virtex). To initialize it, it takes a single object containing several parameters:
+vdux is an opionated, higher-level abstraction over [redux](https://github.com/rackt/redux) and [virtex](https://github.com/ashaffer/virtex). To initialize it, it takes an object containing several parameters:
 
   * `middleware` - An array containing redux middleware you want to use. Defaults to `[]`.
   * `reducer` - Your root redux reducer
   * `initialState` - The initial state atom for your application. Defaults to `{}`.
-  * `app` - A function that accepts `state` and returns a virtual node tree
   * `node` - The root node you want to render `app` into. Defaults to `document.body`.
 
-Once you call vdux with these parameters, you're done. Your application's primary state <-> UI loop is established. From this point forward, nothing your code does will be imperative - every function will accept parameters and return a value, and that's it.
+This returns an object with a few functions:
+
+  * `subscribe(fn)` - Takes a function and gets called with a new state whenever the state updates. Returns a `stop()` function.
+  * `render(vtree, context, force)` - Takes a vtree (e.g. `render(<App state={state} />)`). `context` is an argument that will be passed to the `getProps` function of every component, and `force`, if true, will ignore the `shouldUpdate` functions in all your components for this particular render (useful for hot reloading).
+  * `replaceReducer(reducer)` - Replace the reducer (e.g. for hot reloading)
+  * `dispatch(action)` - Manually dispatch an action. If you have outside event sources or want to dispatch manually for testing purposes, use this.
+
+### The subscribe/render cycle
+
+Primarily you'll be interested in `subscribe` and `render`. These two functions work together to create your application's primary event loop. You set it up like this:
+
+```javascript
+subscribe(state => {
+  render(<App state={state} />)
+})
+```
+
+And from then on, state updates will cause renders, and DOM events from your rendered UI will cause state updates.
 
 ## JSX / Hyperscript
 
@@ -274,6 +292,33 @@ export default {
 }
 ```
 
+### Context / getProps
+
+Sometimes it's too cumbersome to pass everything down from the top of your app. Things like the current url, logged in user, or theme might be too ubiquitous at the leaves of your tree to warrant manually propagating them down via props. For these cases, there is a way out: Context. Context let's you define an object at the top level that any component in the tree can tap into. It is passed as the second argument to render, like this:
+
+```javascript
+subscribe(state => {
+  render(<App {...state} />, {url: state.url, currentUser: state.currentUser})
+})
+```
+
+Your components may then tap into this context using their `getProps` method. `getProps` is the only way for components to access context, and this limitation is by design - context should only be used when it is absolutely necessary.
+
+```javascript
+function getProps (props, context) {
+  return {
+    ...props,
+    url: context.url
+  }
+}
+
+function render ({props}) {
+  return <span>The current url is: {props.url}</span>
+}
+```
+
+Keep in mind that any change to context will cause your entire app to re-render, so only put values in it that change relatively infrequently.
+
 ### Refs
 
 In React, refs let you call functions on other components. vdux does not have a native way of accomplishing this. In vdux, this is considered something of an anti-pattern, and should be avoided as much as possible. However, if you do need to do it, the convention is to use a `ref` prop to expose your component's API, like this:
@@ -374,18 +419,47 @@ function handleLinkClicks (setUrl) {
 Since vdux itself is largely stateless, hot module replacement is trivial. All the code you need is:
 
 ```javascript
-const {replace} = vdux({reducer, app})
+const {subscribe, render, replaceReducer} = vdux({reducer})
+
+subscribe(state => {
+  render(<App state={state} />)
+})
 
 if (module.hot) {
-  module.hot.accept(['./app', './reducer'], () => replace(require('./app'), require('./reducer')))
+  module.hot.accept(['./app', './reducer'], () => {
+    replaceReducer(require('./reducer'))
+    App = require('./app')
+  })
 }
 ```
 
-vdux returns an object containing the `replace` function that allows you to swap out your `app` function and your `reducer`. If you want to swap out something else (like middleware), you should probably reload the page, as it may be stateful. If people want something like this though i'll add it in the future.
+vdux returns an object containing the `replaceReducer` function that allows you to swap out your `reducer` function. If you want to swap out something else (like middleware), you should probably reload the page, as it may be stateful. If people want something like this though i'll add it in the future.
 
 ## Server-side rendering
 
-...Still working on this section...but you can check out the super basic universal example if you want to experiment with it.
+Server-side rendering uses `vdux/string`. And its interface is essentially the same as the DOM renderer:
+
+```javascript
+import vdux from 'vdux/string'
+import createServerMiddleware from './server-middleware'
+
+function prerender (req, res) {
+  const {subscribe, render} = vdux({
+    middleware: createServerMiddleware(req),
+    reducer,
+    initialState
+  })
+
+  const stop = subscribe(state => {
+    const html = render(<App state={state} />)
+
+    if (state.ready) {
+      stop()
+      res.send(html)
+    }
+  })
+}
+```
 
 ## Side-effects
 

@@ -6,15 +6,18 @@ import applyMiddleware from 'redux/lib/applyMiddleware'
 import delegant, {delegateGlobal} from 'delegant'
 import createStore from 'redux/lib/createStore'
 import dom, {reconstitute} from 'virtex-dom'
+import isDomLoaded from '@f/is-dom-loaded'
 import local, {mount} from 'virtex-local'
 import component from 'virtex-component'
 import empty from '@f/empty-element'
 import isObject from '@f/is-object'
 import createQueue from '@f/queue'
+import debounce from '@f/debounce'
 import forEach from '@f/foreach'
 import multi from 'redux-multi'
 import falsy from 'redux-falsy'
 import thunk from 'redux-thunk'
+import equal from '@f/equal'
 import virtex from 'virtex'
 import map from '@f/map'
 
@@ -22,13 +25,18 @@ import map from '@f/map'
  * vdux
  */
 
-function vdux ({middleware = [], reducer, initialState = {}, app, node = document.body, prerendered}) {
+function vdux (opts = {}) {
+  let {middleware = [], reducer = state => state, initialState = {}, node, prerendered} = opts
+
   /**
    * Create redux store
    */
 
-  let vtree
+  let prevTree
+  let context = {}
   let forceUpdate = false
+  let rendering = false
+  let delegated = false
   const dirty = {}
   const components = {}
   const postRenderQueue = createQueue()
@@ -40,6 +48,9 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
     component({
       components,
       postRender: postRenderQueue.add,
+      getContext () {
+        return context
+      },
       ignoreShouldUpdate () {
         return forceUpdate
       }
@@ -54,91 +65,93 @@ function vdux ({middleware = [], reducer, initialState = {}, app, node = documen
 
   const {create, update, updatePaths} = virtex(store.dispatch)
 
-  /**
-   * Empty the root node
-   */
-
-  if (!prerendered) {
-    empty(node)
-  }
-
-  /**
-   * Create the Virtual DOM <-> Redux cycle
-   */
-
-  const unsubscribe = store.subscribe(sync)
-  const undelegate = delegant(document, maybeDispatch)
-  const undelegateGlobal = delegateGlobal(window, maybeDispatch)
-
-  /**
-   * Render the VDOM tree
-   */
-
-  vtree = render()
-  prerendered
-    ? create(vtree, 'a', node.firstChild)
-    : node.appendChild(create(vtree).element)
-
-  // Run any pending afterRender lifecycle hooks
-  postRenderQueue.flush()
-
   return {
-    replace (_app, _reducer) {
-      app = _app
+    replaceReducer (_reducer) {
       reducer = _reducer
       store.replaceReducer(mount('ui', reducer))
-      syncNow(true)
     },
 
     dispatch (action) {
       store.dispatch(action)
     },
 
-    stop () {
-      unsubscribe()
-      undelegate()
-      undelegateGlobal()
+    subscribe (fn) {
+      if (!isDomLoaded()) {
+        throw new Error ('vdux: Please wait until the document (i.e. DOMContentLoaded) is ready before calling subscribe')
+      }
+
+      const debouncedFn = debounce(() => {
+        rendering
+          ? debouncedFn()
+          : fn(store.getState())
+      })
+
+      /**
+       * Create the Virtual DOM <-> Redux cycle
+       */
+
+      const stop = []
+      stop.push(store.subscribe(debouncedFn))
+
+      if (!delegated) {
+        stop.push(delegant(document, store.dispatch))
+        stop.push(delegateGlobal(window, store.dispatch))
+        delegated = true
+      }
+
+      /**
+       * Initial render
+       */
+
+      debouncedFn()
+      return () => stop.forEach(fn => fn())
+    },
+
+    render (tree, _context, force) {
+      // If there is a context update, we need
+      // to do a forced full re-render
+      if (!equal(context, _context)) {
+        context = _context
+        force = true
+      }
+
+      forceUpdate = force
+      rendering = true
+
+      prevTree
+        ? updateDom(prevTree, tree)
+        : createDom(tree)
+
+      prevTree = tree
+      forceUpdate = false
+      rendering = false
     }
-  }
-
-  function maybeDispatch (action) {
-    return action && store.dispatch(action)
-  }
-
-  /**
-   * Render a new virtual dom
-   */
-
-  function render () {
-    return app(store.getState())
   }
 
   /**
    * Sync the virtual dom and the actual dom
    */
 
-  let pending = false
+  function createDom (tree) {
+    node = node || document.body
 
-  function sync () {
-    // Prevent re-entrant renders
-    if (pending) return
-    pending = true
+    if (!prerendered) {
+      empty(node)
+      node.appendChild(create(tree).element)
+    } else {
+      create(tree, 'a', node.firstChild)
+    }
 
-    setTimeout(syncNow)
+    // Run any pending afterRender lifecycle hooks
+    postRenderQueue.flush()
+    return node.firstChild
   }
 
-  function syncNow (_forceUpdate) {
-    pending = false
-    forceUpdate = _forceUpdate
-
-    const newTree = render()
-
-    update(vtree, newTree)
+  function updateDom (oldTree, newTree) {
+    update(oldTree, newTree)
     updateDirty()
     postRenderQueue.flush()
-
-    forceUpdate = false
-    vtree = newTree
+    return node.firstChild
   }
 
   function updateDirty () {

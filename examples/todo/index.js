@@ -21,18 +21,14 @@ const initialState = {
  * Initialize
  */
 
-domready(() => vdux({
+const {subscribe, render} = vdux({
   middleware,
   reducer,
-  initialState,
-  app,
-  node: document.getElementById('app')
-}))
+  initialState
+})
 
-/**
- * App
- */
-
-function app (state) {
-  return <App todos={state.todos} url={state.url} />
-}
+domready(() => {
+  subscribe(state => {
+    render(<App todos={state.todos} url={state.url} />)
+  })
+})

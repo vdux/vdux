@@ -22,17 +22,10 @@ const initialState = {
  * Initialize
  */
 
-domready(() => vdux({
-  middleware,
-  reducer,
-  initialState,
-  app
-}))
+const {subscribe, render} = vdux({middleware, reducer, initialState})
 
-/**
- * App
- */
-
-function app (state) {
-  return <App {...state} />
-}
+domready(() => {
+  subscribe(state => {
+    render(<App {...state} />)
+  })
+})

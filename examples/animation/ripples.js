@@ -33,6 +33,7 @@ function initialState () {
 
 function render ({props, state, local}) {
   const {x, y} = props
+  if (props.ref) props.ref(local(addRipple))
 
   return (
     <div style={defaultStyle}>

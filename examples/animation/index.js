@@ -6,7 +6,7 @@ import middleware from './middleware'
 import domready from '@f/domready'
 import vdux from '../../src/dom'
 import reducer from './reducer'
-import app from './app'
+import _app from './app'
 
 /**
  * initialState
@@ -20,22 +20,22 @@ const initialState = {
  * App
  */
 
-let hmr
-domready(() => hmr = vdux({
-  middleware,
-  reducer,
-  initialState,
-  app
-}))
+let app = _app
+const {subscribe, render, replaceReducer} = vdux({reducer, middleware, initialState})
+
+domready(() => {
+  subscribe(state => {
+    render(app(state))
+  })
+})
 
 /**
  * Hot module replacement
  */
 
 if (module.hot) {
-  // These two lines are waiting on https://github.com/AgentME/browserify-hmr
-  module.hot.decline()
-  module.hot.unaccepted(() => window.location.reload())
-  module.hot.accept(['./reducer', './app'],
-    () => hmr.replace(require('./app').default, require('./reducer').default))
+  module.hot.accept(['./reducer', './app'], () => {
+    replaceReducer(require('./reducer').default)
+    app = require('./app').default
+  })
 }

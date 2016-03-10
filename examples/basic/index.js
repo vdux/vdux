@@ -19,8 +19,9 @@ const initialState = {
  * App
  */
 
-domready(() => vdux({
-  reducer,
-  initialState,
-  app
-}))
+const {subscribe, render} = vdux({reducer, initialState})
+domready(() => {
+  subscribe(state => {
+    render(app(state))
+  })
+})

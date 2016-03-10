@@ -8,18 +8,29 @@ import component from 'virtex-component'
 import string from 'virtex-string'
 import multi from 'redux-multi'
 import falsy from 'redux-falsy'
+import equal from '@f/equal'
 import virtex from 'virtex'
 
 /**
  * vdux
  */
 
-function vdux ({middleware = [], reducer, initialState = {}, app, ready = () => true}) {
+function vdux (opts = {}) {
+  const {middleware = [], reducer = state => state, initialState = {}} = opts
+
   /**
    * Create redux store
    */
 
-  const store = applyMiddleware(falsy, multi, string, local('ui'), component(), ...middleware)(createStore)(mount('ui', reducer), initialState)
+  let context
+  let forceUpdate = false
+
+  const componentOpts = {
+    getContext: () => context,
+    ignoreShouldUpdate: () => forceUpdate
+  }
+
+  const store = applyMiddleware(falsy, multi, string, local('ui'), component(componentOpts), ...middleware)(createStore)(mount('ui', reducer), initialState)
 
   /**
    * Initialize virtex
@@ -31,31 +42,28 @@ function vdux ({middleware = [], reducer, initialState = {}, app, ready = () => 
    * Create the Virtual DOM <-> Redux cycle
    */
 
-  return new Promise((resolve, reject) => {
-    run()
-    const unsub = store.subscribe(() => setTimeout(run))
-
-    function run () {
-      try {
-        const state = store.getState()
-        const vtree = app(state)
-        const html = render(vtree)
-
-        if (ready(state)) {
-          resolve({html, vtree, state})
-          unsub()
-        }
-      } catch (e) {
-        reject(e)
-      }
-    }
-  })
-
   let prev
-  function render (vtree) {
-    const result = (prev ? update(prev, vtree) : create(vtree)).element
-    prev = vtree
-    return result
+
+  return {
+    subscribe (fn) {
+      const deferred = () => setTimeout(() => fn(store.getState()))
+      const stop = store.subscribe(deferred)
+      deferred()
+      return stop
+    },
+
+    render (tree, _context) {
+      if (!equal(context, _context)) {
+        context = _context
+        forceUpdate = true
+      }
+
+      const html = (prev ? update(prev, tree) : create(tree)).element
+      prev = tree
+      forceUpdate = false
+
+      return html
+    }
   }
 }
 

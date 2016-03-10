@@ -10,9 +10,12 @@
     "postpublish": "rm -rf lib"
   },
   "dependencies": {
+    "@f/debounce": "^1.0.0",
     "@f/empty-element": "^1.0.0",
+    "@f/equal": "^1.0.1",
     "@f/event-handler": "^1.0.1",
     "@f/foreach": "^1.2.2",
+    "@f/is-dom-loaded": "^1.0.0",
     "@f/is-object": "^1.1.4",
     "@f/map": "^1.5.3",
     "@f/queue": "^1.0.0",
@@ -23,7 +26,7 @@
     "redux-multi": "^0.1.12",
     "redux-thunk": "^1.0.3",
     "virtex": "^0.3.8",
-    "virtex-component": "^0.4.1",
+    "virtex-component": "^0.4.2",
     "virtex-dom": "^0.3.5",
     "virtex-element": "^0.3.2",
     "virtex-local": "^0.4.7",

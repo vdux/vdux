@@ -13,17 +13,10 @@ import App from './app'
  * Initialize
  */
 
-domready(() => vdux({
-  middleware,
-  reducer,
-  app,
-  node: document.body
-}))
+const {subscribe, render} = vdux({middleware, reducer})
 
-/**
- * App
- */
-
-function app (state) {
-  return <App {...state} />
-}
+domready(() => {
+  subscribe(state => {
+    render(<App {...state} />)
+  })
+})
