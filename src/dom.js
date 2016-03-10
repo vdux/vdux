@@ -125,6 +125,8 @@ function vdux (opts = {}) {
       prevTree = tree
       forceUpdate = false
       rendering = false
+
+      return node.firstChild
     }
   }
 
