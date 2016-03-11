@@ -75,6 +75,10 @@ function vdux (opts = {}) {
       store.dispatch(action)
     },
 
+    getState () {
+      return store.getState()
+    },
+
     subscribe (fn) {
       if (!isDomLoaded()) {
         throw new Error ('vdux: Please wait until the document (i.e. DOMContentLoaded) is ready before calling subscribe')

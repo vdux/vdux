@@ -76,6 +76,7 @@ This returns an object with a few functions:
   * `render(vtree, context, force)` - Takes a vtree (e.g. `render(<App state={state} />)`). `context` is an argument that will be passed to the `getProps` function of every component, and `force`, if true, will ignore the `shouldUpdate` functions in all your components for this particular render (useful for hot reloading).
   * `replaceReducer(reducer)` - Replace the reducer (e.g. for hot reloading)
   * `dispatch(action)` - Manually dispatch an action. If you have outside event sources or want to dispatch manually for testing purposes, use this.
+  * `getState()` - Returns the current redux state atom.
 
 ### The subscribe/render cycle
 
