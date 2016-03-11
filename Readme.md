@@ -255,6 +255,19 @@ In vdux, all of your state is kept in your global redux state atom under the `ui
   * `initialState` - Receives `model` and returns the starting state for your component.
   * `reducer` - A reducing function for your component's state. Receives `(state, action)` and returns a new state.
 
+### afterRender / nextTick
+
+The afterRender function can be used to do things after the element has been parented in the DOM. But sometimes it is also important to do something in your afterRender, and then on precisely the next tick *before* the next render, to do something else (e.g. adding an 'active' class that initiates an animation). You can do this in a guaranteed, safe way by returning a function or array of functions from your `afterRender`. This function is guaranteed to be executed on the next tick and before any additional render calls.  E.g.
+
+```javascript
+function afterRender ({props}, node) {
+  if (props.entering) {
+    addClass(node, 'enter')
+    return () => addClass(node, 'enter-active')
+  }
+}
+```
+
 ### local
 
 The `local` function is how you update the state of your component. It accepts a function that returns an action, and returns a function that creates an action directed to the current component. That's may be a bit hard to digest, so here's an example:

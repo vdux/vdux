@@ -107,7 +107,7 @@ function vdux (opts = {}) {
       return () => stop.forEach(fn => fn())
     },
 
-    render (tree, _context, force) {
+    render (tree, _context = {}, force) {
       // If there is a context update, we need
       // to do a forced full re-render
       if (!equal(context, _context)) {
@@ -124,7 +124,20 @@ function vdux (opts = {}) {
 
       prevTree = tree
       forceUpdate = false
-      rendering = false
+
+      // Run any pending afterRender lifecycle hooks
+      var nextTicks = postRenderQueue.flush()
+
+      // Give afterRender hooks a guaranteed way to execute some code
+      // on the next tick but before the next render
+      setTimeout(() => {
+        forEach(function run (fn) {
+          if ('function' === typeof fn) fn()
+          if (Array.isArray(fn)) forEach(run, fn)
+        }, nextTicks)
+
+        rendering = false
+      })
 
       return node.firstChild
     }
@@ -144,15 +157,12 @@ function vdux (opts = {}) {
       create(tree, 'a', node.firstChild)
     }
 
-    // Run any pending afterRender lifecycle hooks
-    postRenderQueue.flush()
     return node.firstChild
   }
 
   function updateDom (oldTree, newTree) {
     update(oldTree, newTree)
     updateDirty()
-    postRenderQueue.flush()
     return node.firstChild
   }
 

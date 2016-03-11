@@ -18,7 +18,7 @@
     "@f/is-dom-loaded": "^1.0.0",
     "@f/is-object": "^1.1.4",
     "@f/map": "^1.5.3",
-    "@f/queue": "^1.0.0",
+    "@f/queue": "^1.0.2",
     "delegant": "^0.1.10",
     "ev-store": "^7.0.0",
     "redux": "^3.1.2",
