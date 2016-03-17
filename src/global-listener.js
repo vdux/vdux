@@ -11,7 +11,7 @@ import EvStore from 'ev-store'
  * Create a global listener component
  */
 
-function globalListener (element = {}) {
+function globalListener (node = {}) {
   let store
 
   /**
@@ -19,9 +19,9 @@ function globalListener (element = {}) {
    */
 
   function onCreate ({path, props}) {
-    // Allow element to be passed in as a function so that we can late-bind it, for
+    // Allow node to be passed in as a function so that we can late-bind it, for
     // things like document.body, which are only created after the DOM is ready
-    store = store || EvStore('function' === typeof element ? element() : element)
+    store = store || EvStore('function' === typeof node ? node() : node)
     listen(path, props)
   }
 
@@ -34,7 +34,7 @@ function globalListener (element = {}) {
       throw new Error('Window component may have only 1 child')
     }
 
-    return children[0]
+    return children[0] || <span class='global-listener' />
   }
 
   /**
