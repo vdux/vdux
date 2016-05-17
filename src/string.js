@@ -6,6 +6,7 @@ import {createStore, applyMiddleware} from 'redux'
 import local, {mount} from 'virtex-local'
 import component from 'virtex-component'
 import string from 'virtex-string'
+import forEach from '@f/foreach'
 import multi from 'redux-multi'
 import falsy from 'redux-falsy'
 import equal from '@f/equal'
@@ -25,12 +26,20 @@ function vdux (opts = {}) {
   let context
   let forceUpdate = false
 
-  const componentOpts = {
-    getContext: () => context,
-    ignoreShouldUpdate: () => forceUpdate
-  }
-
-  const store = applyMiddleware(falsy, multi, string, local('ui'), component(componentOpts), ...middleware)(createStore)(mount('ui', reducer), initialState)
+  const dirty = {}
+  const components = {}
+  const store = applyMiddleware(
+    falsy,
+    multi,
+    string,
+    local('ui', dirty),
+    component({
+      components,
+      getContext: () => context,
+      ignoreShouldUpdate: () => forceUpdate
+    }),
+    ...middleware
+  )(createStore)(mount('ui', reducer), initialState)
 
   /**
    * Initialize virtex
@@ -58,12 +67,40 @@ function vdux (opts = {}) {
         forceUpdate = true
       }
 
-      const html = (prev ? update(prev, tree) : create(tree)).element
+      const html = (prev ? updateString(prev, tree) : create(tree)).element
       prev = tree
       forceUpdate = false
 
       return html
     }
+  }
+
+  function updateString (prev, next) {
+    next = update(prev, next)
+    updateDirty()
+    return next
+  }
+
+  function updateDirty () {
+    forEach(path => {
+      // Check that it's still dirty, since the re-rendering of a higher component
+      // may cause one of the lower ones to get re-rendered
+      if (dirty[path]) {
+        const component = components[path]
+
+        if (component) {
+          const prev = {...component}
+
+          // Clear cached vnodes/elements
+          component.vnode = null
+          update(prev, component, path)
+        }
+      }
+
+      // Sort by shortest dirty paths first, so that if possible
+      // we get some of the higher re-renders cleaning up some
+      // of the lower ones
+    }, Object.keys(dirty).sort((a, b) => a.length - b.length))
   }
 }
 
