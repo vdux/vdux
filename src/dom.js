@@ -7,6 +7,7 @@ import delegant, {delegateGlobal} from 'delegant'
 import createStore from 'redux/lib/createStore'
 import dom, {reconstitute} from 'virtex-dom'
 import isDomLoaded from '@f/is-dom-loaded'
+import virtex, {findDOMNode} from 'virtex'
 import local, {mount} from 'virtex-local'
 import component from 'virtex-component'
 import empty from '@f/empty-element'
@@ -18,7 +19,6 @@ import multi from 'redux-multi'
 import falsy from 'redux-falsy'
 import thunk from 'redux-thunk'
 import equal from '@f/equal'
-import virtex from 'virtex'
 import map from '@f/map'
 
 /**
@@ -198,3 +198,6 @@ function vdux (opts = {}) {
  */
 
 export default vdux
+export {
+  findDOMNode
+}
