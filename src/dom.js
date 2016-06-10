@@ -13,6 +13,7 @@ import component from 'virtex-component'
 import empty from '@f/empty-element'
 import isObject from '@f/is-object'
 import createQueue from '@f/queue'
+import debounce from '@f/debounce'
 import forEach from '@f/foreach'
 import multi from 'redux-multi'
 import falsy from 'redux-falsy'
@@ -83,13 +84,18 @@ function vdux (opts = {}) {
         throw new Error ('vdux: Please wait until the document (i.e. DOMContentLoaded) is ready before calling subscribe')
       }
 
+      const debouncedFn = debounce(() => {
+        rendering
+          ? debouncedFn()
+          : fn(store.getState())
+      })
+
       /**
        * Create the Virtual DOM <-> Redux cycle
        */
 
       const stop = []
-      let queued = false
-      stop.push(store.subscribe(update))
+      stop.push(store.subscribe(debouncedFn))
 
       if (!delegated) {
         stop.push(delegant(document, store.dispatch))
@@ -101,14 +107,8 @@ function vdux (opts = {}) {
        * Initial render
        */
 
-      update()
+      debouncedFn()
       return () => stop.forEach(fn => fn())
-
-      function update () {
-        rendering
-          ? queued || setTimeout(() => (queued = true) && update())
-          : fn(store.getState())
-      }
     },
 
     render (tree, _context = {}, force) {
