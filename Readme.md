@@ -285,7 +285,7 @@ function render ({local, state}) {
   )
 }
 
-function counter () {
+function increment () {
   return {
     type: 'INCREMENT'
   }
