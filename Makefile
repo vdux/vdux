@@ -13,8 +13,11 @@ node_modules: package.json
 	@npm install
 	@touch node_modules
 
-test: node_modules
-	${BIN}/babel-tape-runner test/*.js
+test: $(src) $(tests) node_modules
+	@NODE_ENV=development hihat test/*.js -- \
+		--debug \
+		-t babelify \
+		-p tap-dev-tool
 
 validate: node_modules
 	@${BIN}/standard
