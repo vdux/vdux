@@ -11,7 +11,6 @@ import forEach from '@f/foreach'
 import multi from 'redux-multi'
 import falsy from 'redux-falsy'
 import thunk from 'redux-thunk'
-import equal from '@f/equal'
 import flo from 'redux-flo'
 import virtex from 'virtex'
 
