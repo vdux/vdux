@@ -37,7 +37,7 @@
     "virtex": "^0.4.0",
     "virtex-component": "^0.5.0",
     "virtex-dom": "^0.3.12",
-    "virtex-element": "^0.4.0",
+    "virtex-element": "^0.4.1",
     "virtex-string": "^0.3.6"
   },
   "devDependencies": {
