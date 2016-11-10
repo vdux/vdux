@@ -3,38 +3,34 @@
  */
 
 import applyMiddleware from 'redux/lib/applyMiddleware'
+import component, {forceUpdate} from 'virtex-component'
 import delegant, {delegateGlobal} from 'delegant'
+import {ephemeralReducer} from 'redux-ephemeral'
 import createStore from 'redux/lib/createStore'
-import dom, {reconstitute} from 'virtex-dom'
-import isDomLoaded from '@f/is-dom-loaded'
 import virtex, {findDOMNode} from 'virtex'
-import local, {mount} from 'virtex-local'
-import component from 'virtex-component'
 import empty from '@f/empty-element'
-import isObject from '@f/is-object'
 import createQueue from '@f/queue'
 import debounce from '@f/debounce'
+import domready from '@f/domready'
 import forEach from '@f/foreach'
-import multi from 'redux-multi'
 import falsy from 'redux-falsy'
 import thunk from 'redux-thunk'
-import equal from '@f/equal'
-import map from '@f/map'
+import multi from 'redux-multi'
+import dom from 'virtex-dom'
+import flo from 'redux-flo'
 
 /**
  * vdux
  */
 
-function vdux (opts = {}) {
-  let {middleware = [], reducer = state => state, initialState = {}, node, prerendered} = opts
+function vdux (app, opts = {}) {
+  let {middleware = [], initialState, node, prerendered} = opts
 
   /**
    * Create redux store
    */
 
   let prevTree
-  let context = {}
-  let forceUpdate = false
   let rendering = false
   let delegated = false
   const dirty = {}
@@ -42,109 +38,111 @@ function vdux (opts = {}) {
   const postRenderQueue = createQueue()
   const store = applyMiddleware(
     falsy,
-    multi,
     dom,
-    local('ui', dirty),
     component({
       components,
+      dirty,
       postRender: postRenderQueue.add,
-      getContext () {
-        return context
-      },
-      ignoreShouldUpdate () {
-        return forceUpdate
-      }
+      forceRerender
     }),
+    multi,
     thunk,
+    flo(),
     ...middleware
-  )(createStore)(mount('ui', reducer), initialState)
+  )(createStore)(ephemeralReducer, initialState)
 
   /**
    * Initialize virtex
    */
 
   const {create, update, updatePaths} = virtex(store.dispatch)
+  let unsubscribe
+
+  domready(() => unsubscribe = subscribe(state => render(app(state))))
 
   return {
-    replaceReducer (_reducer) {
-      reducer = _reducer
-      store.replaceReducer(mount('ui', reducer))
-    },
-
     dispatch (action) {
-      store.dispatch(action)
+      return store.dispatch(action)
     },
 
     getState () {
       return store.getState()
     },
 
-    subscribe (fn) {
-      if (!isDomLoaded()) {
-        throw new Error ('vdux: Please wait until the document (i.e. DOMContentLoaded) is ready before calling subscribe')
-      }
-
-      const debouncedFn = debounce(() => {
-        rendering
-          ? debouncedFn()
-          : fn(store.getState())
-      })
-
-      /**
-       * Create the Virtual DOM <-> Redux cycle
-       */
-
-      const stop = []
-      stop.push(store.subscribe(debouncedFn))
-
-      if (!delegated) {
-        stop.push(delegant(document, store.dispatch))
-        stop.push(delegateGlobal(window, store.dispatch))
-        delegated = true
-      }
-
-      /**
-       * Initial render
-       */
-
-      debouncedFn()
-      return () => stop.forEach(fn => fn())
+    stop () {
+      unsubscribe()
     },
 
-    render (tree, _context = {}, force) {
-      // If there is a context update, we need
-      // to do a forced full re-render
-      if (!equal(context, _context)) {
-        context = _context
-        force = true
+    forceRerender
+  }
+
+  function forceRerender () {
+    store.dispatch(forceUpdate())
+    render(app(store.getState()))
+  }
+
+  function subscribe (fn) {
+    const debouncedFn = debounce(() => {
+      rendering
+        ? debouncedFn()
+        : fn(store.getState())
+    })
+
+    /**
+     * Create the Virtual DOM <-> Redux cycle
+     */
+
+    const stop = []
+    stop.push(store.subscribe(debouncedFn))
+
+    if (!delegated) {
+      stop.push(delegant(document, handleAction))
+      stop.push(delegateGlobal(window, handleAction))
+      delegated = true
+
+      function handleAction (handler, e) {
+        if (handler) {
+          const action = handler(e)
+
+          if (action) {
+            store.dispatch(action)
+          }
+        }
       }
-
-      forceUpdate = force
-      rendering = true
-
-      prevTree
-        ? updateDom(prevTree, tree)
-        : createDom(tree)
-
-      prevTree = tree
-      forceUpdate = false
-
-      // Run any pending afterRender lifecycle hooks
-      var nextTicks = postRenderQueue.flush()
-
-      // Give afterRender hooks a guaranteed way to execute some code
-      // on the next tick but before the next render
-      setTimeout(() => {
-        forEach(function run (fn) {
-          if ('function' === typeof fn) fn()
-          if (Array.isArray(fn)) forEach(run, fn)
-        }, nextTicks)
-
-        rendering = false
-      })
-
-      return node.firstChild
     }
+
+    /**
+     * Initial render
+     */
+
+    debouncedFn()
+    return () => stop.forEach(fn => fn())
+  }
+
+  function render (tree) {
+    rendering = true
+
+    prevTree
+      ? updateDom(prevTree, tree)
+      : createDom(tree)
+
+    prevTree = tree
+
+    // Run any pending afterRender lifecycle hooks
+    var nextTicks = postRenderQueue.flush()
+
+    // Give afterRender hooks a guaranteed way to execute some code
+    // on the next tick but before the next render
+    setTimeout(() => {
+      forEach(function run (fn) {
+        if ('function' === typeof fn) fn()
+        if (Array.isArray(fn)) forEach(run, fn)
+      }, nextTicks)
+
+      rendering = false
+    })
+
+    return node.firstChild
   }
 
   /**
@@ -198,6 +196,3 @@ function vdux (opts = {}) {
  */
 
 export default vdux
-export {
-  findDOMNode
-}

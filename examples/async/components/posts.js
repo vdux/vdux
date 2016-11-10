@@ -2,7 +2,7 @@
  * Imports
  */
 
-import element from '../../../element'
+import {element} from '../../..'
 
 /**
  * Render

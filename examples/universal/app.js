@@ -2,31 +2,31 @@
  * Imports
  */
 
-import element from '../../element'
+import {component, element} from '../..'
 
 /**
  * App
  */
 
-function app ({props}) {
-  return (
-    <div>
-      <div onClick={increment}>Counter: {props.counter}</div>
-      <p>
-        <i>Append ?counter=&lt;n&gt; to the url to see the server-side rendering in action</i>
-      </p>
-    </div>
-  )
-}
+export default component({
+  initialState: ({props}) => ({
+    counter: props.initialValue
+  }),
 
-function increment () {
-  return {
-    type: 'INCREMENT'
+  render ({state, actions}) {
+    return (
+      <div>
+        <div onClick={[actions.increment]}>Counter: {state.counter}</div>
+        <p>
+          <i>Append ?counter=&lt;n&gt; to the url to see the server-side rendering in action</i>
+        </p>
+      </div>
+    )
+  },
+
+  reducer: {
+    increment: state => ({
+      counter: state.counter + 1
+    })
   }
-}
-
-/**
- * Exports
- */
-
-export default app
+})

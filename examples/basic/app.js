@@ -9,13 +9,7 @@ import h from '../../element'
  */
 
 function app (state) {
-  return h('div', {onClick: increment}, ['Counter: ' + state.counter])
-}
-
-function increment () {
-  return {
-    type: 'INCREMENT'
-  }
+  return h('div', {onClick: 'INCREMENT'}, ['Counter: ' + state.counter])
 }
 
 /**

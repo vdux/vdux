@@ -2,90 +2,53 @@
  * Imports
  */
 
-import {removeTodo, setImportant, setCompleted, setTodoText} from '../actions/curried'
-import combineReducers from '@f/combine-reducers'
-import handleActions from '@f/handle-actions'
-import createAction from '@f/create-action'
-import element from '../../../element'
+import {component, element} from '../../..'
 import Dropdown from './dropdown'
 
 /**
- * Initial state
+ * <Todo/>
  */
 
-function initialState () {
-  return {
+export default component({
+  initialState: {
     editing: false
+  },
+
+  reducer: {
+    beginEdit: (state, editText) => ({editing: true, editText}),
+    cancelEdit: () => ({editing: false}),
+    setEditText: (state, e) => ({editText: e.target.value})
+  },
+
+  render ({state, props, actions}) {
+    const {text, important, completed, idx, todoApi} = props
+    const {beginEdit, cancelEdit, setEditText, handleKeydown} = actions
+    const {setTodoText, removeTodo, setImportant, setCompleted} = todoApi
+    const {editing, editText} = state
+
+    const submit = editText
+      ? [setTodoText(idx, editText), cancelEdit]
+      : removeTodo(idx)
+
+    return (
+      <li class={{completed, important, editing}}>
+        <div class='view' onDblclick={beginEdit(text)}>
+          <input class='toggle' type='checkbox' onChange={setCompleted(idx, !completed)} checked={completed} />
+          <label style={{color: important ? 'red' : 'black'}}>
+            {text}
+            <Dropdown btn={<img class='options' src='css/options.png' />}>
+              <div onClick={setImportant(idx, !important)}>Important</div>
+              <div onClick={removeTodo(idx)}>Remove</div>
+            </Dropdown>
+          </label>
+        </div>
+        <input class='edit'
+          focused={editing}
+          value={editText}
+          onBlur={editing && submit}
+          onInput={setEditText}
+          onKeyDown={{enter: submit, esc: cancelEdit}} />
+      </li>
+    )
   }
-}
-
-/**
- * Render
- */
-
-function render ({state, props, local}) {
-  const {text, important, completed, idx} = props
-  const {editing, editText} = state
-  const edit = local(beginEdit, text)
-  const cancel = local(cancelEdit)
-  const submit = editText
-    ? [setTodoText(idx, editText), cancel]
-    : removeTodo(idx)
-
-  let toggle
-
-  return (
-    <li class={{completed, important, editing}}>
-      <div class='view' onDblclick={edit}>
-        <input class='toggle' type='checkbox' onChange={setCompleted(idx, !completed)} checked={completed} />
-        <label style={{color: important ? 'red' : 'black'}}>
-          {text}
-          <img class='options' src='css/options.png' onClick={e => toggle()} />
-          <Dropdown ref={_toggle => toggle = _toggle}>
-            <div onClick={setImportant(idx, !important)}>Important</div>
-            <div onClick={removeTodo(idx)}>Remove</div>
-          </Dropdown>
-        </label>
-      </div>
-      <input class='edit'
-        focused={editing}
-        value={editText}
-        onBlur={editing && submit}
-        onInput={local(setEditText)}
-        onKeyDown={{enter: submit, esc: cancel}} />
-    </li>
-  )
-}
-
-/**
- * Local actions
- */
-
-const beginEdit = createAction('BEGIN_EDIT')
-const cancelEdit = createAction('CANCEL_EDIT')
-const setEditText = createAction('SET_EDIT_TEXT', e => e.currentTarget.value.trim())
-
-/**
- * Local reducer
- */
-
-const reducer = combineReducers({
-  editing: handleActions({
-    [beginEdit]: () => true,
-    [cancelEdit]: () => false
-  }),
-  editText: handleActions({
-    [beginEdit]: (state, text) => text,
-    [setEditText]: (state, text) => text
-  })
 })
-
-/**
- * Exports
- */
-
-export default {
-  initialState,
-  render,
-  reducer
-}

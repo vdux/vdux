@@ -2,7 +2,7 @@
  * Imports
  */
 
-import element from '../../../element'
+import {element} from '../../..'
 
 /**
  * Render
@@ -14,7 +14,7 @@ function render ({props}) {
   return (
     <span>
       <h1>{value}</h1>
-      <select onChange={e => onChange(e.target.value)}>
+      <select onChange={onChange}>
         {options.map(opt => <option value={opt} key={opt}>{opt}</option>)}
       </select>
     </span>

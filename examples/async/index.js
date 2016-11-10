@@ -2,27 +2,24 @@
  * Imports
  */
 
-import middleware from './middleware'
-import element from '../../element'
+import 'regenerator-runtime/runtime'
+import fetch from 'redux-effects-fetch'
+import logger from 'redux-logger'
 import domready from '@f/domready'
 import vdux from '../../src/dom'
-import reducer from './reducer'
+import {element} from '../..'
 import App from './app'
-
-/**
- * initialState
- */
-
-const initialState = {
-  reddit: 'reactjs',
-  posts: []
-}
 
 /**
  * Initialize
  */
 
-const {subscribe, render} = vdux({middleware, reducer, initialState})
+const {subscribe, render} = vdux({
+  middleware: [
+    fetch,
+    logger()
+  ]
+})
 
 domready(() => {
   subscribe(state => {

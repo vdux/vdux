@@ -2,8 +2,7 @@
  * Imports
  */
 
-import element from '../../../element'
-import {clearCompleted} from '../actions'
+import {element, component} from '../../..'
 
 /**
  * Filters
@@ -16,39 +15,38 @@ const filters = {
 }
 
 /**
- * Render
+ * <Footer/>
  */
 
-function render ({props}) {
-  const {itemsLeft = 0, completed = 0, active} = props
-  const itemStr = itemsLeft === 1 ? 'item' : 'items'
+export default component({
+  render ({props, context}) {
+    const {itemsLeft = 0, completed = 0, active, clearCompleted} = props
+    const itemStr = itemsLeft === 1 ? 'item' : 'items'
 
-  return (
-    <footer id='footer' class='footer'>
-      <span class='todo-count'>
-        <strong>{itemsLeft}</strong> {itemStr} left
-      </span>
-      <ul class='filters'>
-        {
-          Object.keys(filters).map(key =>
-            <li><a href={filters[key]} class={{selected: isSelected(key)}}>{key}</a></li>
-          )
-        }
-      </ul>
-      <button class='clear-completed' onClick={clearCompleted} style={{display: completed ? 'block' : 'none'}}>
-        Clear Completed
-      </button>
-    </footer>
-  )
-
-  function isSelected (name) {
-    return !active && name === 'All'
-      || name.toLowerCase() === active
+    return (
+      <footer id='footer' class='footer'>
+        <span class='todo-count'>
+          <strong>{itemsLeft}</strong> {itemStr} left
+        </span>
+        <ul class='filters'>
+          {
+            Object.keys(filters).map(key =>
+              <li><a href={filters[key]} class={{selected: isSelected(key, active)}}>{key}</a></li>
+            )
+          }
+        </ul>
+        <button class='clear-completed' onClick={clearCompleted} style={{display: completed ? 'block' : 'none'}}>
+          Clear Completed
+        </button>
+      </footer>
+    )
   }
-}
+})
 
 /**
- * Exports
+ * Helpers
  */
 
-export default render
+function isSelected (name, active) {
+  return !active && name === 'All' || name.toLowerCase() === active
+}

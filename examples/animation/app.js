@@ -12,15 +12,9 @@ import Button from './button'
 function app (state) {
   return (
     <div>
-      <Button onClick={increment}>Counter: {state.counter}</Button>
+      <Button onClick={'INCREMENT'}>Counter: {state.counter}</Button>
     </div>
   )
-}
-
-function increment () {
-  return {
-    type: 'INCREMENT'
-  }
 }
 
 /**

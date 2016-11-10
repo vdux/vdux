@@ -13,89 +13,85 @@ Stateless virtual dom &lt;-&gt; Redux.
 
     $ cd examples/basic && budo --live index.js -- -t babelify
 
+## Philosophy
+
+vdux is an opinionated bridge between a [virtual DOM library](https://github.com/vdux/virtex) and [redux](https://github.com/reactjs/redux). It takes the react/redux philosophy and flips it on its head. Vdux believes that *all* state should be component-local and that the component is the sole, fundamental building block of your application. Components may bring their own middleware and ought to control the application lifecycle in its entirety.
+
+Why all local state? Because almost all state has some sort of lifecycle. If you have global state, put it in your top-most component. The thing that I think mostly drove the concept of global state was server-side rendering. But that is solved by vdux's other innovation: all your local state is stored in a single, accessible, immutable state atom. You can reconstitute your *entire* state tree from the server on the client, with no exceptions. You can do that very simply, like this:
+
+```js
+function * serverRender () {
+  const {state, html} = yield vdux(<App />)
+
+  this.body = `<html>
+    <head>
+      <script src='/vdux.js'></script>
+      <script src='/app.js'></script>
+      <script>
+        vdux(() => <App />, {
+          initialState: ${JSON.stringify(state),
+          prerendered: true
+        })
+      </script>
+    </head>
+    <body>
+      ${html}
+    </body>
+  </html>`
+}
+```
+
 ## Minimal counter example
 
 ```javascript
 import vdux from 'vdux/dom'
-import element from 'vdux/element'
-import ready from 'domready'
+import {component, element} from 'vdux'
 
 /**
  * Initialize the app
  */
 
-const initialState = {
-  counter: 0
-}
-
-function reducer (state, action) {
-  if (action.type === 'INCREMENT') {
-    return {...state, counter: state.counter + 1}
-  }
-
-  return state
-}
-
-const {subscribe, render} = vdux({reducer, initialState})
-
-ready(() => {
-  subscribe(state => {
-    render(<Counter value={state.counter} />)
-  })
-})
+vdux(() => <App />)
 
 /**
  * App
  */
 
-const Counter = {
-  render ({props}) {
-    return <div onClick={increment}>Value: {props.value}</div>
-  }
-}
+const App = component({
+  render ({state, actions}) {
+    return <div onClick={actions.increment}>Value: {state.value}</div>
+  },
 
-function increment () {
-  return {
-    type: 'INCREMENT'
+  reducer: {
+    increment: state => ({
+      value: state.value + 1
+    })
   }
 }
 ```
 
 ## Usage
 
-vdux is an opionated, higher-level abstraction over [redux](https://github.com/rackt/redux) and [virtex](https://github.com/ashaffer/virtex). To initialize it, it takes an object containing several parameters:
+vdux is an opionated, higher-level abstraction over [redux](https://github.com/rackt/redux) and [virtex](https://github.com/ashaffer/virtex). You initialize it in the browser like this:
 
-  * `middleware` - An array containing redux middleware you want to use. Defaults to `[]`.
-  * `reducer` - Your root redux reducer
-  * `initialState` - The initial state atom for your application. Defaults to `{}`.
-  * `node` - The root node you want to render `app` into. Defaults to `document.body`.
+```js
+import vdux from 'vdux/dom'
+import App from 'components/App'
+
+vdux(() => <App />)
+```
 
 This returns an object with a few functions:
 
-  * `subscribe(fn)` - Takes a function and gets called with a new state whenever the state updates. Returns a `stop()` function.
-  * `render(vtree, context, force)` - Takes a vtree (e.g. `render(<App state={state} />)`). `context` is an argument that will be passed to the `getProps` function of every component, and `force`, if true, will ignore the `shouldUpdate` functions in all your components for this particular render (useful for hot reloading).
-  * `replaceReducer(reducer)` - Replace the reducer (e.g. for hot reloading)
   * `dispatch(action)` - Manually dispatch an action. If you have outside event sources or want to dispatch manually for testing purposes, use this.
   * `getState()` - Returns the current redux state atom.
-
-### The subscribe/render cycle
-
-Primarily you'll be interested in `subscribe` and `render`. These two functions work together to create your application's primary event loop. You set it up like this:
-
-```javascript
-subscribe(state => {
-  render(<App state={state} />)
-})
-```
-
-And from then on, state updates will cause renders, and DOM events from your rendered UI will cause state updates.
+  * `stop()` - Stop the application cycle.
+  * `forceRerender()` - Forces a full rerender. Useful for hot reloading.
 
 ## JSX / Hyperscript
 
-vdux's JSX pragma is accessible on `vdux/element`. E.g.
-
 ```javascript
-import element from 'vdux/element'
+import {element} from 'vdux'
 
 export default function render () {
   return <div>Hello world!</div>
@@ -114,57 +110,50 @@ Put this in your `.babelrc` and `npm install babel-plugin-transform-react-jsx` t
 
 ## DOM Events / Actions
 
-Your event handlers are pure functions that return a value. That value is then dispatched into redux. This forms a [cycle](https://github.com/cyclejs/cycle-core) that will define your entire application in a side-effect free way.
-
-Using hyperscript:
+Your event handlers are generator functions or state reducers specified by your component. They will be specified in the `controller` and `reducer` properties, respectively.
 
 ```javascript
-import h from 'vdux/element'
+import {component, element} from 'vdux'
+import sleep from '@f/sleep'
 
-function counter ({props}) {
-  return h('div', {'onClick': increment}, ['Value: ' + props.counter])
-}
+export default component({
+  render ({state, actions}) {
+    return (
+      <div onClick={actions.increment}>Value: {state.counter}</div>
+      <button onClick={actions.incrementAsync(100)}>Increment Async</button>
+    )
+  },
 
-function increment () {
-  return {
-    type: 'INCREMENT'
+  controller: {
+    * incrementAsync ({actions}, milliseconds) {
+      yield sleep(milliseconds)
+      yield actions.increment()
+    }
+  },
+
+  reducer: {
+    increment: state => ({
+      state: state.value + 1
+    })
   }
-}
+})
 ```
 
-Or using JSX:
+### Autocurrying
 
-```javascript
-import element from 'vdux/element'
-
-function render ({props}) {
-  return <div onClick={increment}>Value: {props.counter}</div>
-}
-
-function increment () {
-  return {
-    type: 'INCREMENT'
-  }
-}
-
-export default render
-```
+All your actions will autocurry indefinitely. That means that you can pass down a curried action like this: `updateEntity(id)`, and then the component below you can add more parameters to it. Internally, the arguments you are accumulating will be exposed on the function that's passed down. This means that vdux can diff your actions in a meaningful way, so passing functions down through many layers of your application will not create performance problems.
 
 ### Event names
 
 Also of note, vdux is unopinionated about the casing of event handler prop names. If you are wondering if it's `onKeyDown` or `onKeydown`, both/all will work, even `ONKEYDOWN`, or `onkeydown`. As long as it matches the case-insensitive regex `on(?:domEventNames.join('|'))`, it'll work. If you want to know whether an event you want is included, check out [dom-events](https://github.com/micro-js/dom-events) for the complete list - and if one you want isn't there, just send a PR to that module.
 
-## `element` sugar
-
-The JSX pragma `element` comes with a bit of syntactic sugar to make your life easier out of the box. If you don't like its opinions or don't use its features and don't want them bloating your bundle, you can write your own on top of the `element` exported by [virtex](https://github.com/ashaffer/virtex) and use that instead.
-
-### Events
+## Events
 
 If you want to do more than one thing in response to an event, you can pass an array of handlers, like this:
 
 ```javascript
 function render () {
-  return <div onClick={[fetchPosts, closeDropdown]}></div>
+  return <div onClick={[actions.fetchPosts, actions.closeDropdown]}></div>
 }
 ```
 
@@ -172,8 +161,61 @@ The return values of both handlers will be dispatched into redux. There is also 
 
 ```javascript
 function render () {
-  return <input onKeydown={{enter: submit, esc: cancel, 'shift+enter': newline}} />
+  return <input onKeydown={{enter: actions.submit, esc: actions.cancel, 'shift+enter': actions.newline}} />
 }
+```
+
+### Decoders
+
+By default, most of your event handlers will receive no arguments (unless you curry them) with the exception of the `input` and `change` events, which by default receive `event.target.value`. However, if you need to access something else, or if you want to `stopPropagation/preventDefault`, you can use a 'decoder'. This is a concept borrowed from [Elm](https://github.com/elm-lang). Decoders get access to the raw event and can transform it and return something suitable for consumption by your handler. vdux comes with a number of default decoders:
+
+  * decodeRaw - Passes `event`
+  * decodeNode - Passes `e.target`
+  * decodeValue - Passes `e.target.value`
+  * decodeFiles - Passes `e.target.files`
+  * decodeMouse - Passes `{clientX: e.clientX, clientY: e.clientY}`
+
+You can import any of these from `vdux` and use them like this:
+
+```
+component({
+  render ({actions}) {
+    return (
+      <div onMouseMove={decodeMouse(actions.updateCoords)} style={{width: '400px', height: '400px'>
+        x: {state.clientX}
+        y: {state.clientY}
+      </div>
+    )
+  },
+
+  reducer: {
+    updateCoords: (state, coords) => coords
+  }
+})
+```
+
+### Custom decoders
+
+If you need to implement your own custom decoder, you can import `decoder` from vdux, like this:
+
+```js
+import {decoder} from 'vdux'
+
+const decodeRelatedTarget = decoder(e => e.relatedTarget)
+```
+
+### stopPropagation / preventDefault
+
+You can do this one of two ways. You can use `decodeRaw` and call these methods yourself on the raw event, or you can use the special declarative handlers vdux provides you. Example:
+
+```js
+import {component, element, stopPropagation} from 'vdux'
+
+component({
+  render () {
+    return <button onClick={[actions.handleClick, stopPropagation]} />
+  }
+})
 ```
 
 ## Inline styles
@@ -208,18 +250,6 @@ function render ({props}) {
 
 You can also recursively mix and match these things, like `['class1', {class2: props.class2}]`.
 
-## Focus
-
-`element` allows you to declaratively focus on an element by setting the `focused` property to true. Like this:
-
-```javascript
-function render ({props}) {
-  return <input focused={props.shouldFocus} />
-}
-```
-
-Do be careful though that you're not setting `focused` on multiple elements at the same time, otherwise which one ends up actually receiving focus will be undefined (and amount to which one renders first).
-
 ## Components
 
 Components in vdux look a lot like components in other virtual dom libraries. You have a `render`, and some lifecycle hooks. Your `render` function receives a `model` that looks like this:
@@ -227,20 +257,9 @@ Components in vdux look a lot like components in other virtual dom libraries. Yo
   * `props` - The arguments passed in by your parent
   * `children` - The child elements of your component
   * `state` - The state of your component
-  * `local` - Directs an action to the current component's reducer (see the local state section)
+  * `context` - A context object specified by your root component
+  * `actions` - Directs an action to the current component's reducer (see the local state section)
   * `path` - The dotted path to your component in the DOM tree. For the most part, you probably don't need to worry about this.
-
-### shouldUpdate
-
-By default, this is taken care of for you. [virtex-component](https://github.com/ashaffer/virtex-component) assumes that your data is immutable, and will do a shallow equality check on `props` and `children` to decide if your component needs to re-render. If you want to implement your own, it works like this (this is the one [virtex-component](https://github.com/ashaffer/virtex-component) uses):
-
-```javascript
-function shouldUpdate (prev, next) {
-  return !arrayEqual(prev.children, next.children) || !objectEqual(prev.props, next.props)
-}
-```
-
-Where `prev` is the previous model and `next` is the next model.
 
 ### Hooks
 
@@ -248,13 +267,6 @@ Where `prev` is the previous model and `next` is the next model.
   * `onUpdate` - When the model changes. Receives `prev` and `next` models.
   * `afterRender` - Called after any render. Passed the model and the root DOM node of the component. Runs only in the browser. It is recommended that you avoid using it as much as possible - but it is necessary in a few cases like positioning elements relative to one another.
   * `onRemove` - When the component is removed. Receives `model`.
-
-## Local state
-
-In vdux, all of your state is kept in your global redux state atom under the `ui` property. In order to support component local state, your component may export two additional functions:
-
-  * `initialState` - Receives `model` and returns the starting state for your component.
-  * `reducer` - A reducing function for your component's state. Receives `(state, action)` and returns a new state.
 
 ### afterRender / nextTick
 
@@ -269,107 +281,35 @@ function afterRender ({props}, node) {
 }
 ```
 
-### local
+### Context
 
-The `local` function is how you update the state of your component. It accepts a function that returns an action, and returns a function that creates an action directed to the current component. That's may be a bit hard to digest, so here's an example:
+Sometimes it's too cumbersome to pass everything down from the top of your app. Things like the current url, logged in user, or theme might be too ubiquitous at the leaves of your tree to warrant manually propagating them down via props. For these cases, there is a way out: Context. Context let's you define an object at the top level that any component in the tree can tap into. It is specified by the top-most component of your app. *Only* your root component may specify a `getContext` function. There is no layering of context.
 
-```javascript
-function initialState () {
-  return {
-    value: 0
-  }
-}
+```js
 
-function render ({local, state}) {
-  return <div onClick={local(increment)}>Counter: {state.counter}</div>
-  )
-}
+/**
+ * <App/>
+ */
 
-function increment () {
-  return {
-    type: 'INCREMENT'
-  }
-}
-
-function reducer (state, action) {
-  if (action.type === 'INCREMENT') {
+export default component({
+  getContext ({actions, state}) {
     return {
-      value: state.value + 1
+      url: state.url,
+      currentUser: state.currentUser,
+      logUserIn: actions.logUserIn
+      logUserOut: actions.logUserOut
     }
+  },
+
+  render ({state}) {
+    return <Router url={state.url} />
   }
-}
 
-export default {
-  initialState
-  render,
-  reducer
-}
-```
-
-### Context / getProps
-
-Sometimes it's too cumbersome to pass everything down from the top of your app. Things like the current url, logged in user, or theme might be too ubiquitous at the leaves of your tree to warrant manually propagating them down via props. For these cases, there is a way out: Context. Context let's you define an object at the top level that any component in the tree can tap into. It is passed as the second argument to render, like this:
-
-```javascript
-subscribe(state => {
-  render(<App {...state} />, {url: state.url, currentUser: state.currentUser})
+  // ...
 })
 ```
 
-Your components may then tap into this context using their `getProps` method. `getProps` is the only way for components to access context, and this limitation is by design - context should only be used when it is absolutely necessary.
-
-```javascript
-function getProps (props, context) {
-  return {
-    ...props,
-    url: context.url
-  }
-}
-
-function render ({props}) {
-  return <span>The current url is: {props.url}</span>
-}
-```
-
-Keep in mind that any change to context will cause your entire app to re-render, so only put values in it that change relatively infrequently.
-
-### Refs
-
-In React, refs let you call functions on other components. vdux does not have a native way of accomplishing this. In vdux, this is considered something of an anti-pattern, and should be avoided as much as possible. However, if you do need to do it, the convention is to use a `ref` prop to expose your component's API, like this:
-
-```javascript
-import Dropdown from 'components/dropdown'
-
-function render () {
-  let open
-
-  return (
-    <button onClick={e => open()}>Open Dropdown</button>
-    <Dropdown ref={_open => open = _open}>
-      <li>item</li>
-    </Dropdown>
-  )
-}
-```
-
-In dropdown.js you'd then do:
-
-```javascript
-function render ({props, local}) {
-  if (props.ref) props.ref(local(open))
-
-  return (
-    // Render the dropdown, etc...
-  )
-}
-
-
-function open () {
-  return {
-    type: 'OPEN'
-  }
-}
-```
+From then on, `context` will be available in every component's model. Any time context changes, the entire application will be rerendered, so do not put things in there that change often. Note: it is particularly useful to put actions that manipulate your top-level state into your context. This allows you to pass global actions down to your lower-level components in a clean way.
 
 ## Global event handlers
 
@@ -433,77 +373,142 @@ function handleLinkClicks (setUrl) {
 Since vdux itself is largely stateless, hot module replacement is trivial. All the code you need is:
 
 ```javascript
-const {subscribe, render, replaceReducer} = vdux({reducer})
-
-subscribe(state => {
-  render(<App state={state} />)
-})
+const {forceRerender} = vdux(() => <App />)
 
 if (module.hot) {
-  module.hot.accept(['./app', './reducer'], () => {
-    replaceReducer(require('./reducer'))
+  module.hot.accept(['./app'], () => {
     App = require('./app')
+    forceRerender()
   })
 }
 ```
-
-vdux returns an object containing the `replaceReducer` function that allows you to swap out your `reducer` function. If you want to swap out something else (like middleware), you should probably reload the page, as it may be stateful. If people want something like this though i'll add it in the future.
 
 ## Server-side rendering
 
 Server-side rendering uses `vdux/string`. And its interface is essentially the same as the DOM renderer:
 
-```javascript
+```js
 import vdux from 'vdux/string'
-import createServerMiddleware from './server-middleware'
 
-function prerender (req, res) {
-  const {subscribe, render} = vdux({
-    middleware: createServerMiddleware(req),
-    reducer,
-    initialState
-  })
-
-  const stop = subscribe(state => {
-    const html = render(<App state={state} />)
-
-    if (state.ready) {
-      stop()
-      res.send(html)
-    }
-  })
+function * render (req) {
+  const {html, state} = yield vdux(() => <App req={req} />)
+  this.body = page(html, state)
 }
 ```
 
-## Side-effects
+### Delayed server-side rendering
 
-Almost side-effect free, anyway. You still need to do things like issue requests. I recommend you contain these effects in your redux middleware stack. Here are some libraries / strategies for doing this:
+If you just use the code above, your app will simply return its initial render. However, often you may want to grab the current user and other information from your API/DB server, and this may take an indeterminate amount of time before you decide that the app is 'ready' to be rendered. If you want to do this, you need to pass `awaitReady` into vdux's second parameter, like this:
 
-  * [redux-effects](https://github.com/redux-effects/redux-effects)
-  * [redux-thunk](https://github.com/gaearon/redux-thunk)
-  * [redux-promise](https://github.com/acdlite/redux-promise)
+```js
+import vdux from 'vdux/string'
 
-## Ecosystem
+function * render (req) {
+  const {html, state} = yield vdux(() => <App req={req} />, {awaitReady: true})
+  this.body = page(html, state)
+}
+```
 
-### Internal submodules
+This will cause the `yield` to block until the `appReady` action is dispatched. You can do that like this:
 
-vdux itself is very small. It is primarily composed of other, smaller modules:
+```js
+import fetchMw, {fetch} from 'redux-effects-fetch'
+import {appReady, component, element} from 'vdux'
+import InternalApp from 'components/InternalApp'
+import Loading from 'components/Loading'
+import cookie from 'cookie'
 
-  * [redux](https://github.com/rackt/redux) - Functional state container.
-  * [virtex](https://github.com/ashaffer/virtex) - The redux-based virtual dom library used by vdux. You don't need to use this - it's already in vdux, but you will need to add virtex middleware to your redux middleware stack.
-  * [virtex-element](https://github.com/ashaffer/virtex-element) - A high-level, opionated JSX pragma for virtex nodes. You probably want to use this for getting started, but later on you may be interested in adding your own sugary element creators.
-  * [virtex-dom](https://github.com/ashaffer/virtex-dom) - DOM rendering redux middleware backend for virtex. You need this if you want to be rendering DOM nodes.
-  * [virtex-string](https://github.com/ashaffer/virtex-string) - String rendering redux middleware backend. Use this for server-side rendering and tests.
-  * [virtex-component](https://github.com/ashaffer/virtex-component) - Lets virtex understand components. Adds nice react/deku-style components with hooks, `shouldUpdate`, and other civilized things.
-  * [virtex-local](https://github.com/ashaffer/virtex-local) - Give your components local state, housed inside your redux state atom. Note that you will also need [redux-ephemeral](https://github.com/ashaffer/redux-ephemeral) mounted into your reducer for this to work.
-  * [redux-ephemeral](https://github.com/ashaffer/redux-ephemeral) - Allows your reducer to manage transient local state (i.e. component local state).
+/**
+ * <App/>
+ */
 
-If you want to try something more advanced, you can create your own vdux by composing these modules and inserting others in your own way.
+export default component({
+  initialState ({props}) {
+    if (props.req) {
+      const cookieObj = cookieParser.parse(props.req.headers.cookie || '')
+
+      return {
+        currentUrl: props.req.url,
+        authToken: cookieObj.authToken || ''
+      }
+    }
+  },
+
+  onCreate ({actions}) {
+    return actions.fetchUser()
+  }
+
+  render ({state}) {
+    return state.user ? <InternalApp/> : <Loading/>
+  },
+
+  onUpdate (prev, next) {
+    if (!prev.state.user && next.state.user) {
+      return appReady()
+    }
+  },
+
+  middleware: [
+    fetch
+  ],
+
+  controller: {
+    * fetchUser ({state, props}) {
+      if (!state.user && !state.userLoading && props.req) {
+        const userId = cookie(props.req.headers['Cookie'])
+        yield actions.userLoading()
+        const user = yield fetch(`/user/${userId}`, {
+          headers: {
+            Authentication: 'Bearer ' + state.authToken
+          }
+        })
+        yield actions.userLoaded(user)
+      }
+    }
+  },
+
+  reducer: {
+    userLoading: () => ({userLoading: true}),
+    userLoaded: (state, user) => ({
+      userLoading: false,
+      user
+    })
+  }
+})
+```
+
+### Middleware
+
+Your components may also specify custom middleware. This can enable them to run side-effects in a functionally pure way. Your component middleware will receive all the same things that redux middleware does a `getContext` function to retrieve the local context. Additionally the `getState` function that the middleware receives will be the state of the local component that it was installed in.
+
+Your middleware will receive any actions yielded by your controller methods, and they will receive them first. This means that you can use your middleware to debounce your actions or otherwise transform them, or simply enable new side-effectful actions. An example of debouncing/throttling middleware is [redux-timing](https://github.com/ashaffer/redux-timing).
+
+#### Different middleware for different environments
+
+You can specify your middleware as an array, but you can also specify an object with different environment keys, like this:
+
+```
+middleware: {
+  node: [
+    // Node-specific middleware
+  ],
+
+  browser: [
+    // Browser-specific middleware
+  ],
+
+  shared: [
+    // Shared middleware
+  ]
+}
+```
 
 ### Components
 
 Take a look at the org [vdux-components](https://github.com/vdux-components) for more.
 
+  * [ui](https://github.com/vdux-components/ui) - Large stateless kit of UI components
+  * [containers](https://github.com/vdux-components/containers) - Stateful wrappers around all of the vdux-ui components that add some features like `hoverProps`, etc..
   * [delay](https://github.com/vdux-components/delay) - Delay the rendering of child components, or execution of an action for a declaratively specified period.
   * [hover](https://github.com/vdux-components/hover) - Hover component
 
