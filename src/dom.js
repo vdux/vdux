@@ -8,9 +8,9 @@ import delegant, {delegateGlobal} from 'delegant'
 import {ephemeralReducer} from 'redux-ephemeral'
 import createStore from 'redux/lib/createStore'
 import virtex, {findDOMNode} from 'virtex'
+import rafDebounce from '@f/raf-debounce'
 import empty from '@f/empty-element'
 import createQueue from '@f/queue'
-import debounce from '@f/debounce'
 import domready from '@f/domready'
 import forEach from '@f/foreach'
 import falsy from 'redux-falsy'
@@ -24,7 +24,7 @@ import flo from 'redux-flo'
  */
 
 function vdux (app, opts = {}) {
-  let {middleware = [], initialState, node, prerendered} = opts
+  let {middleware = [], initialState, node, prerendered, beforeRender, afterRender} = opts
 
   /**
    * Create redux store
@@ -82,7 +82,7 @@ function vdux (app, opts = {}) {
   }
 
   function subscribe (fn) {
-    const debouncedFn = debounce(() => {
+    const debouncedFn = rafDebounce(() => {
       rendering
         ? debouncedFn()
         : fn(store.getState())
@@ -120,6 +120,8 @@ function vdux (app, opts = {}) {
   }
 
   function render (tree) {
+    beforeRender && beforeRender()
+
     rendering = true
 
     prevTree
@@ -142,6 +144,7 @@ function vdux (app, opts = {}) {
       rendering = false
     })
 
+    afterRender && afterRender()
     return node.firstChild
   }
 
