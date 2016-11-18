@@ -8,6 +8,7 @@ import {appReady} from './app-ready'
 import component from './component'
 import getValue from '@f/get-value'
 import {findDOMNode} from 'virtex'
+import t from 'tcomb-validation'
 
 /**
  * Global pseudo-components to listen on
@@ -56,5 +57,7 @@ export {
   decodeMouse,
 
   stopPropagation,
-  preventDefault
+  preventDefault,
+
+  t
 }

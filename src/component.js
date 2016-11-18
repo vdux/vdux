@@ -2,20 +2,23 @@
  * Imports
  */
 
-import has from '@f/has'
 import applyMiddleware from 'redux/lib/applyMiddleware'
+import t from 'tcomb-validation'
+import has from '@f/has'
 
 /**
  * Component factory
  */
 
 function component (data) {
-  if (typeof data === 'function') data = {render: data}
+  if (typeof data === 'function') data = {name: data.name, render: data}
 
   const {controller, reducer, actions, middleware, initialState = {}} = data
 
   return {
     ...data,
+    propTypes: typeof data.propTypes === 'object' ? t.struct(data.propTypes) : data.propTypes,
+    stateTypes: data.stateTypes && t.struct(data.stateTypes),
     middleware: createMiddleware(middleware),
     initialState: typeof initialState === 'function'
       ? initialState
