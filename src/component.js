@@ -3,7 +3,7 @@
  */
 
 import applyMiddleware from 'redux/lib/applyMiddleware'
-import t from 'tcomb-validation'
+import {t} from 'virtex-component'
 import has from '@f/has'
 
 /**
