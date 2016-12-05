@@ -8,7 +8,7 @@ import {appReady} from './app-ready'
 import component from './component'
 import getValue from '@f/get-value'
 import {findDOMNode} from 'virtex'
-import t from 'tcomb-validation'
+import {t} from 'virtex-component'
 
 /**
  * Global pseudo-components to listen on
