@@ -28,7 +28,7 @@
     "redux-multi": "^0.1.91",
     "redux-thunk": "^1.0.3",
     "virtex": "^0.4.0",
-    "virtex-component": "^0.5.3",
+    "virtex-component": "^0.5.4",
     "virtex-dom": "^0.3.12",
     "virtex-element": "^0.4.1",
     "virtex-string": "^0.3.6"
